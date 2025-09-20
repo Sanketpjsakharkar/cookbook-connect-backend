@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { Request, Response } from 'express';
 import { GraphQLFormattedError } from 'graphql';
 import { join } from 'path';
@@ -20,6 +21,11 @@ import { DatabaseModule } from '@/core/database';
 
 // Feature modules
 import { HealthModule } from '@/health/health.module';
+import { AuthModule } from '@/features/auth/auth.module';
+import { UsersModule } from '@/features/users/users.module';
+import { RecipesModule } from '@/features/recipes/recipes.module';
+import { SocialModule } from '@/features/social/social.module';
+import { JwtAuthGuard } from '@/shared/guards';
 
 @Module({
   imports: [
@@ -76,6 +82,16 @@ import { HealthModule } from '@/health/health.module';
 
     // Feature modules
     HealthModule,
+    AuthModule,
+    UsersModule,
+    RecipesModule,
+    SocialModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}
