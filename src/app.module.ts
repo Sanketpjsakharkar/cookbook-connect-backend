@@ -26,6 +26,7 @@ import { RecipesModule } from '@/features/recipes/recipes.module';
 import { SearchModule } from '@/features/search/search.module';
 import { SocialModule } from '@/features/social/social.module';
 import { UsersModule } from '@/features/users/users.module';
+import { AIModule } from '@/features/ai-assistant/ai.module';
 import { HealthModule } from '@/health/health.module';
 import { JwtAuthGuard } from '@/shared/guards';
 
@@ -131,6 +132,7 @@ import { JwtAuthGuard } from '@/shared/guards';
     SocialModule,
     SearchModule,
     NotificationsModule,
+    AIModule,
   ],
   providers: [
     {
