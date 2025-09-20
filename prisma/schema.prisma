@@ -1,0 +1,187 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+enum RecipeDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum CuisineType {
+  ITALIAN
+  CHINESE
+  MEXICAN
+  INDIAN
+  FRENCH
+  JAPANESE
+  THAI
+  MEDITERRANEAN
+  AMERICAN
+  OTHER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  bio       String?
+  avatar    String?
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  recipes   Recipe[]
+  ratings   Rating[]
+  comments  Comment[]
+  followers Follow[] @relation("UserFollowers")
+  following Follow[] @relation("UserFollowing")
+
+  // Indexes
+  @@index([email])
+  @@index([username])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model Recipe {
+  id          String           @id @default(uuid())
+  title       String
+  description String?
+  cuisine     CuisineType?
+  difficulty  RecipeDifficulty?
+  cookingTime Int? // in minutes
+  servings    Int?
+  imageUrl    String?
+  isPublic    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Relations
+  authorId     String
+  author       User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  ingredients  Ingredient[]
+  instructions Instruction[]
+  ratings      Rating[]
+  comments     Comment[]
+
+  // Computed fields (handled in application layer)
+  // avgRating Float?
+  // ratingsCount Int?
+  // commentsCount Int?
+
+  // Indexes
+  @@index([authorId])
+  @@index([title])
+  @@index([createdAt])
+  @@index([cuisine])
+  @@index([difficulty])
+  @@index([isPublic])
+  @@map("recipes")
+}
+
+model Ingredient {
+  id       String  @id @default(uuid())
+  name     String
+  quantity Float
+  unit     String
+  notes    String?
+
+  // Relations
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([recipeId])
+  @@index([name])
+  @@map("ingredients")
+}
+
+model Instruction {
+  id          String @id @default(uuid())
+  stepNumber  Int
+  description String
+
+  // Relations
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([recipeId])
+  @@index([stepNumber])
+  @@map("instructions")
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  value     Int // 1-5 stars
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([userId, recipeId])
+  @@index([recipeId])
+  @@index([value])
+  @@map("ratings")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId String
+  recipe   Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([recipeId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+model Follow {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  followerId  String
+  follower    User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
