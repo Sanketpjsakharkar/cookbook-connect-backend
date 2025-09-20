@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { Request, Response } from 'express';
+import { GraphQLFormattedError } from 'graphql';
 import { join } from 'path';
 
 // Core modules
@@ -48,13 +49,17 @@ import { HealthModule } from '@/health/health.module';
         res,
       }),
       formatError: (
-        error: Error & { extensions?: { exception?: { stacktrace?: string } } },
-      ) => {
+        formattedError: GraphQLFormattedError,
+      ): GraphQLFormattedError => {
         // Remove sensitive information from errors in production
-        if (process.env.NODE_ENV === 'production') {
-          delete error.extensions?.exception?.stacktrace;
+        if (
+          process.env.NODE_ENV === 'production' &&
+          formattedError.extensions?.exception
+        ) {
+          const exception = formattedError.extensions.exception as any;
+          delete exception.stacktrace;
         }
-        return error;
+        return formattedError;
       },
     }),
 
