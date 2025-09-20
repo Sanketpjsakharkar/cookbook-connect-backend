@@ -27,6 +27,7 @@
     "docker:logs": "docker-compose logs -f",
     "es:setup": "ts-node src/cli/elasticsearch-setup.ts",
     "test:realtime": "ts-node src/cli/test-realtime.ts",
+    "test:ai": "ts-node src/cli/test-ai-features.ts",
     "prepare": "husky install"
   },
   "keywords": [],

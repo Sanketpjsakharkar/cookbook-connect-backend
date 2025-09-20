@@ -20,6 +20,7 @@ import {
 import { DatabaseModule } from '@/core/database';
 
 // Feature modules
+import { AIModule } from '@/features/ai-assistant/ai.module';
 import { AuthModule } from '@/features/auth/auth.module';
 import { NotificationsModule } from '@/features/notifications/notifications.module';
 import { RecipesModule } from '@/features/recipes/recipes.module';
@@ -131,6 +132,7 @@ import { JwtAuthGuard } from '@/shared/guards';
     SocialModule,
     SearchModule,
     NotificationsModule,
+    AIModule,
   ],
   providers: [
     {
