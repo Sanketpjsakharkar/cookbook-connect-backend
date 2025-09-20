@@ -1,6 +1,6 @@
 export class CookingTipsPrompt {
-  static getSystemMessage(): string {
-    return `You are a master chef and cooking instructor. Your task is to provide helpful, practical cooking tips based on recipe analysis, cooking techniques, and skill level requirements.
+    static getSystemMessage(): string {
+        return `You are a master chef and cooking instructor. Your task is to provide helpful, practical cooking tips based on recipe analysis, cooking techniques, and skill level requirements.
 
 Guidelines for cooking tips:
 1. Provide actionable, specific advice
@@ -26,28 +26,28 @@ Format your response as a JSON object:
   "commonMistakes": ["Common mistakes to avoid"],
   "successIndicators": ["How to know when the dish is done correctly"]
 }`;
-  }
+    }
 
-  static generatePrompt(recipe: {
-    title: string;
-    description?: string;
-    ingredients: Array<{ name: string; quantity: string; unit: string }>;
-    instructions: Array<{ stepNumber: number; instruction: string }>;
-    cuisine?: string;
-    difficulty?: string;
-    cookingTime?: number;
-    servings?: number;
-  }): string {
-    const ingredientsList = recipe.ingredients
-      .map(ing => `- ${ing.quantity} ${ing.unit} ${ing.name}`)
-      .join('\n');
+    static generatePrompt(recipe: {
+        title: string;
+        description?: string;
+        ingredients: Array<{ name: string; quantity: string; unit: string }>;
+        instructions: Array<{ stepNumber: number; instruction: string }>;
+        cuisine?: string;
+        difficulty?: string;
+        cookingTime?: number;
+        servings?: number;
+    }): string {
+        const ingredientsList = recipe.ingredients
+            .map(ing => `- ${ing.quantity} ${ing.unit} ${ing.name}`)
+            .join('\n');
 
-    const instructionsList = recipe.instructions
-      .sort((a, b) => a.stepNumber - b.stepNumber)
-      .map(inst => `${inst.stepNumber}. ${inst.instruction}`)
-      .join('\n');
+        const instructionsList = recipe.instructions
+            .sort((a, b) => a.stepNumber - b.stepNumber)
+            .map(inst => `${inst.stepNumber}. ${inst.instruction}`)
+            .join('\n');
 
-    return `Please provide cooking tips and guidance for this recipe:
+        return `Please provide cooking tips and guidance for this recipe:
 
 **Recipe:** ${recipe.title}
 **Description:** ${recipe.description || 'No description provided'}
@@ -63,12 +63,12 @@ ${ingredientsList}
 ${instructionsList}
 
 Provide practical cooking tips, technique guidance, and advice to help ensure success with this recipe.`;
-  }
+    }
 
-  static generateTechniquePrompt(techniques: string[], difficulty: string): string {
-    const techniquesList = techniques.join(', ');
-    
-    return `Please provide cooking tips for these techniques used in a ${difficulty} difficulty recipe:
+    static generateTechniquePrompt(techniques: string[], difficulty: string): string {
+        const techniquesList = techniques.join(', ');
+
+        return `Please provide cooking tips for these techniques used in a ${difficulty} difficulty recipe:
 
 **Cooking Techniques:** ${techniquesList}
 
@@ -78,17 +78,17 @@ Focus on:
 3. Equipment recommendations
 4. Timing and temperature guidance
 5. Visual and sensory cues for success`;
-  }
+    }
 
-  static generateIngredientTipsPrompt(
-    ingredients: Array<{ name: string; quantity: string; unit: string }>,
-    cookingMethod: string,
-  ): string {
-    const ingredientsList = ingredients
-      .map(ing => `- ${ing.quantity} ${ing.unit} ${ing.name}`)
-      .join('\n');
+    static generateIngredientTipsPrompt(
+        ingredients: Array<{ name: string; quantity: string; unit: string }>,
+        cookingMethod: string,
+    ): string {
+        const ingredientsList = ingredients
+            .map(ing => `- ${ing.quantity} ${ing.unit} ${ing.name}`)
+            .join('\n');
 
-    return `Please provide ingredient-specific tips for ${cookingMethod}:
+        return `Please provide ingredient-specific tips for ${cookingMethod}:
 
 **Ingredients:**
 ${ingredientsList}
@@ -101,15 +101,15 @@ Focus on:
 3. Storage and handling advice
 4. How each ingredient behaves during cooking
 5. Timing for adding ingredients`;
-  }
+    }
 
-  static generateTroubleshootingPrompt(
-    recipeTitle: string,
-    commonIssues: string[],
-  ): string {
-    const issuesList = commonIssues.join(', ');
-    
-    return `Please provide troubleshooting advice for common issues with this recipe:
+    static generateTroubleshootingPrompt(
+        recipeTitle: string,
+        commonIssues: string[],
+    ): string {
+        const issuesList = commonIssues.join(', ');
+
+        return `Please provide troubleshooting advice for common issues with this recipe:
 
 **Recipe:** ${recipeTitle}
 **Common Issues:** ${issuesList}
@@ -119,19 +119,19 @@ Provide:
 2. How to prevent them
 3. How to fix them if they happen
 4. Alternative approaches to avoid problems`;
-  }
+    }
 
-  static generateSkillLevelTipsPrompt(
-    recipeTitle: string,
-    targetSkillLevel: 'beginner' | 'intermediate' | 'advanced',
-  ): string {
-    const skillGuidance = {
-      beginner: 'Focus on basic techniques, safety, and building confidence',
-      intermediate: 'Emphasize technique refinement and flavor development',
-      advanced: 'Highlight professional techniques and creative variations',
-    };
+    static generateSkillLevelTipsPrompt(
+        recipeTitle: string,
+        targetSkillLevel: 'beginner' | 'intermediate' | 'advanced',
+    ): string {
+        const skillGuidance = {
+            beginner: 'Focus on basic techniques, safety, and building confidence',
+            intermediate: 'Emphasize technique refinement and flavor development',
+            advanced: 'Highlight professional techniques and creative variations',
+        };
 
-    return `Please provide cooking tips tailored for ${targetSkillLevel} cooks making this recipe:
+        return `Please provide cooking tips tailored for ${targetSkillLevel} cooks making this recipe:
 
 **Recipe:** ${recipeTitle}
 **Target Skill Level:** ${targetSkillLevel}
@@ -139,5 +139,5 @@ Provide:
 **Focus:** ${skillGuidance[targetSkillLevel]}
 
 Provide tips that are appropriate for this skill level, including technique explanations and confidence-building advice.`;
-  }
+    }
 }

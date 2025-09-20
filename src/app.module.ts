@@ -20,13 +20,13 @@ import {
 import { DatabaseModule } from '@/core/database';
 
 // Feature modules
+import { AIModule } from '@/features/ai-assistant/ai.module';
 import { AuthModule } from '@/features/auth/auth.module';
 import { NotificationsModule } from '@/features/notifications/notifications.module';
 import { RecipesModule } from '@/features/recipes/recipes.module';
 import { SearchModule } from '@/features/search/search.module';
 import { SocialModule } from '@/features/social/social.module';
 import { UsersModule } from '@/features/users/users.module';
-import { AIModule } from '@/features/ai-assistant/ai.module';
 import { HealthModule } from '@/health/health.module';
 import { JwtAuthGuard } from '@/shared/guards';
 

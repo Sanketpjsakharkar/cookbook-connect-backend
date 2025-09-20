@@ -1,6 +1,6 @@
 export class RecipeImprovementPrompt {
-  static getSystemMessage(): string {
-    return `You are a professional chef and culinary expert. Your task is to analyze recipes and suggest improvements to make them more appealing, clear, and delicious.
+    static getSystemMessage(): string {
+        return `You are a professional chef and culinary expert. Your task is to analyze recipes and suggest improvements to make them more appealing, clear, and delicious.
 
 Guidelines for recipe improvement suggestions:
 1. Focus on clarity and readability of instructions
@@ -24,27 +24,27 @@ Format your response as a JSON object with the following structure:
   "overallRating": "1-10 rating of the original recipe",
   "summary": "Brief summary of main improvements needed"
 }`;
-  }
+    }
 
-  static generatePrompt(recipe: {
-    title: string;
-    description?: string;
-    ingredients: Array<{ name: string; quantity: string; unit: string }>;
-    instructions: Array<{ stepNumber: number; instruction: string }>;
-    cuisine?: string;
-    difficulty?: string;
-    cookingTime?: number;
-  }): string {
-    const ingredientsList = recipe.ingredients
-      .map(ing => `- ${ing.quantity} ${ing.unit} ${ing.name}`)
-      .join('\n');
+    static generatePrompt(recipe: {
+        title: string;
+        description?: string;
+        ingredients: Array<{ name: string; quantity: string; unit: string }>;
+        instructions: Array<{ stepNumber: number; instruction: string }>;
+        cuisine?: string;
+        difficulty?: string;
+        cookingTime?: number;
+    }): string {
+        const ingredientsList = recipe.ingredients
+            .map(ing => `- ${ing.quantity} ${ing.unit} ${ing.name}`)
+            .join('\n');
 
-    const instructionsList = recipe.instructions
-      .sort((a, b) => a.stepNumber - b.stepNumber)
-      .map(inst => `${inst.stepNumber}. ${inst.instruction}`)
-      .join('\n');
+        const instructionsList = recipe.instructions
+            .sort((a, b) => a.stepNumber - b.stepNumber)
+            .map(inst => `${inst.stepNumber}. ${inst.instruction}`)
+            .join('\n');
 
-    return `Please analyze this recipe and suggest improvements:
+        return `Please analyze this recipe and suggest improvements:
 
 **Recipe Title:** ${recipe.title}
 **Description:** ${recipe.description || 'No description provided'}
@@ -59,14 +59,14 @@ ${ingredientsList}
 ${instructionsList}
 
 Please provide specific, actionable suggestions to improve this recipe's clarity, flavor, and overall appeal.`;
-  }
+    }
 
-  static generateQuickPrompt(recipeTitle: string, description: string): string {
-    return `Suggest 3 quick improvements for this recipe:
+    static generateQuickPrompt(recipeTitle: string, description: string): string {
+        return `Suggest 3 quick improvements for this recipe:
 
 **Recipe:** ${recipeTitle}
 **Description:** ${description}
 
 Provide brief, practical suggestions to enhance flavor, technique, or presentation.`;
-  }
+    }
 }
