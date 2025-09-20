@@ -1,8 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ElasticsearchService } from '@/core/infrastructure/elasticsearch';
 import { PrismaService } from '@/core/database';
+import { ElasticsearchService } from '@/core/infrastructure/elasticsearch';
+import { Injectable, Logger } from '@nestjs/common';
 import { SearchQueryInput } from '../dto/search-query.dto';
-import { SearchResult, AutocompleteResult } from '../dto/search-result.dto';
+import { AutocompleteResult, SearchResult } from '../dto/search-result.dto';
 
 @Injectable()
 export class SearchService {
@@ -15,10 +15,10 @@ export class SearchService {
 
   async searchRecipes(searchQuery: SearchQueryInput): Promise<SearchResult> {
     const startTime = Date.now();
-    
+
     try {
       const query = this.buildSearchQuery(searchQuery);
-      
+
       const response = await this.elasticsearchService.search('recipes', {
         query: query.query,
         sort: query.sort,
@@ -27,16 +27,21 @@ export class SearchService {
         _source: ['id'], // Only return IDs for efficiency
       });
 
-      const recipeIds = response.hits.hits.map((hit: any) => hit._source.id);
-      
+      const recipeIds = response.hits.hits.map(
+        (hit: { _source: { id: string } }) => hit._source.id,
+      );
+
       // Fetch full recipe data from database to ensure consistency
       const recipes = await this.fetchRecipesFromDatabase(recipeIds);
-      
+
       const took = Date.now() - startTime;
-      
+
       return {
         recipes,
-        total: (response.hits.total as any)?.value || response.hits.total || 0,
+        total:
+          typeof response.hits.total === 'number'
+            ? response.hits.total
+            : (response.hits.total as { value: number })?.value || 0,
         took,
         maxScore: response.hits.max_score || undefined,
       };
@@ -46,16 +51,17 @@ export class SearchService {
     }
   }
 
-  async cookWithWhatIHave(ingredients: string[], limit: number = 20): Promise<SearchResult> {
+  async cookWithWhatIHave(
+    ingredients: string[],
+    limit: number = 20,
+  ): Promise<SearchResult> {
     const startTime = Date.now();
-    
+
     try {
       const query = {
         query: {
           bool: {
-            must: [
-              { term: { isPublic: true } },
-            ],
+            must: [{ term: { isPublic: true } }],
             should: ingredients.map(ingredient => ({
               nested: {
                 path: 'ingredients',
@@ -99,14 +105,19 @@ export class SearchService {
       };
 
       const response = await this.elasticsearchService.search('recipes', query);
-      const recipeIds = response.hits.hits.map((hit: any) => hit._source.id);
+      const recipeIds = response.hits.hits.map(
+        (hit: { _source: { id: string } }) => hit._source.id,
+      );
       const recipes = await this.fetchRecipesFromDatabase(recipeIds);
-      
+
       const took = Date.now() - startTime;
-      
+
       return {
         recipes,
-        total: (response.hits.total as any)?.value || response.hits.total || 0,
+        total:
+          typeof response.hits.total === 'number'
+            ? response.hits.total
+            : (response.hits.total as { value: number })?.value || 0,
         took,
         maxScore: response.hits.max_score || undefined,
       };
@@ -116,9 +127,12 @@ export class SearchService {
     }
   }
 
-  async autocompleteIngredients(query: string, limit: number = 10): Promise<AutocompleteResult> {
+  async autocompleteIngredients(
+    query: string,
+    limit: number = 10,
+  ): Promise<AutocompleteResult> {
     const startTime = Date.now();
-    
+
     try {
       const searchQuery = {
         query: {
@@ -159,11 +173,16 @@ export class SearchService {
         _source: ['name'],
       };
 
-      const response = await this.elasticsearchService.search('ingredients', searchQuery);
-      
-      const suggestions = response.hits.hits.map((hit: any) => hit._source.name);
+      const response = await this.elasticsearchService.search(
+        'ingredients',
+        searchQuery,
+      );
+
+      const suggestions = response.hits.hits.map(
+        (hit: { _source: { name: string } }) => hit._source.name,
+      );
       const took = Date.now() - startTime;
-      
+
       return {
         suggestions,
         took,
@@ -175,12 +194,10 @@ export class SearchService {
   }
 
   private buildSearchQuery(searchQuery: SearchQueryInput) {
-    const mustClauses: any[] = [
-      { term: { isPublic: true } },
-    ];
+    const mustClauses: object[] = [{ term: { isPublic: true } }];
 
-    const shouldClauses: any[] = [];
-    const filterClauses: any[] = [];
+    const shouldClauses: object[] = [];
+    const filterClauses: object[] = [];
 
     // Text search
     if (searchQuery.query) {
@@ -256,10 +273,10 @@ export class SearchService {
 
     // Servings filtering
     if (searchQuery.minServings || searchQuery.maxServings) {
-      const servingsRange: any = {};
+      const servingsRange: { gte?: number; lte?: number } = {};
       if (searchQuery.minServings) servingsRange.gte = searchQuery.minServings;
       if (searchQuery.maxServings) servingsRange.lte = searchQuery.maxServings;
-      
+
       filterClauses.push({
         range: { servings: servingsRange },
       });
@@ -336,9 +353,11 @@ export class SearchService {
       .map(id => recipeMap.get(id))
       .filter(Boolean)
       .map(recipe => {
-        const avgRating = recipe!.ratings.length > 0
-          ? recipe!.ratings.reduce((sum, rating) => sum + rating.value, 0) / recipe!.ratings.length
-          : null;
+        const avgRating =
+          recipe!.ratings.length > 0
+            ? recipe!.ratings.reduce((sum, rating) => sum + rating.value, 0) /
+              recipe!.ratings.length
+            : null;
 
         return {
           ...recipe,
@@ -348,6 +367,6 @@ export class SearchService {
         };
       });
 
-    return orderedRecipes as any;
+    return orderedRecipes;
   }
 }
