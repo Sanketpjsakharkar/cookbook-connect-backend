@@ -25,6 +25,7 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
+    "es:setup": "ts-node src/cli/elasticsearch-setup.ts",
     "prepare": "husky install"
   },
   "keywords": [],
