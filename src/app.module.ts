@@ -25,6 +25,7 @@ import { AuthModule } from '@/features/auth/auth.module';
 import { UsersModule } from '@/features/users/users.module';
 import { RecipesModule } from '@/features/recipes/recipes.module';
 import { SocialModule } from '@/features/social/social.module';
+import { SearchModule } from '@/features/search/search.module';
 import { JwtAuthGuard } from '@/shared/guards';
 
 @Module({
@@ -86,6 +87,7 @@ import { JwtAuthGuard } from '@/shared/guards';
     UsersModule,
     RecipesModule,
     SocialModule,
+    SearchModule,
   ],
   providers: [
     {
