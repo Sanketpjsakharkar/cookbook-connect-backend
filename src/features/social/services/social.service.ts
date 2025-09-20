@@ -1,19 +1,29 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '@/core/database';
-import { SocialRepository } from '../repositories/social.repository';
-import { CreateRatingInput } from '../dto/create-rating.dto';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCommentInput } from '../dto/create-comment.dto';
+import { CreateRatingInput } from '../dto/create-rating.dto';
+import { SocialRepository } from '../repositories/social.repository';
 
 @Injectable()
 export class SocialService {
   constructor(
     private socialRepository: SocialRepository,
     private prismaService: PrismaService,
-  ) {}
+    private notificationsService?: any, // Optional to avoid circular dependency
+  ) { }
 
   // Rating methods
   async createOrUpdateRating(userId: string, createRatingInput: CreateRatingInput) {
-    return this.socialRepository.createRating(userId, createRatingInput);
+    const rating = await this.socialRepository.createRating(userId, createRatingInput);
+
+    // Send real-time notification asynchronously
+    if (this.notificationsService) {
+      this.notificationsService.createRatingNotification(rating.id, userId, createRatingInput.recipeId).catch((error: any) => {
+        console.error('Failed to send rating notification:', error);
+      });
+    }
+
+    return rating;
   }
 
   async deleteRating(userId: string, recipeId: string) {
@@ -30,7 +40,16 @@ export class SocialService {
 
   // Comment methods
   async createComment(userId: string, createCommentInput: CreateCommentInput) {
-    return this.socialRepository.createComment(userId, createCommentInput);
+    const comment = await this.socialRepository.createComment(userId, createCommentInput);
+
+    // Send real-time notification asynchronously
+    if (this.notificationsService) {
+      this.notificationsService.createCommentNotification(comment.id, userId, createCommentInput.recipeId).catch((error: any) => {
+        console.error('Failed to send comment notification:', error);
+      });
+    }
+
+    return comment;
   }
 
   async updateComment(id: string, userId: string, content: string) {
@@ -64,7 +83,16 @@ export class SocialService {
 
   // Follow methods
   async followUser(followerId: string, followingId: string) {
-    return this.socialRepository.followUser(followerId, followingId);
+    const follow = await this.socialRepository.followUser(followerId, followingId);
+
+    // Send real-time notification asynchronously
+    if (this.notificationsService) {
+      this.notificationsService.createFollowNotification(followerId, followingId).catch((error: any) => {
+        console.error('Failed to send follow notification:', error);
+      });
+    }
+
+    return follow;
   }
 
   async unfollowUser(followerId: string, followingId: string) {

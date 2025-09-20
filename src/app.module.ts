@@ -1,9 +1,9 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
 import { Request, Response } from 'express';
 import { GraphQLFormattedError } from 'graphql';
 import { join } from 'path';
@@ -20,12 +20,13 @@ import {
 import { DatabaseModule } from '@/core/database';
 
 // Feature modules
-import { HealthModule } from '@/health/health.module';
 import { AuthModule } from '@/features/auth/auth.module';
-import { UsersModule } from '@/features/users/users.module';
+import { NotificationsModule } from '@/features/notifications/notifications.module';
 import { RecipesModule } from '@/features/recipes/recipes.module';
-import { SocialModule } from '@/features/social/social.module';
 import { SearchModule } from '@/features/search/search.module';
+import { SocialModule } from '@/features/social/social.module';
+import { UsersModule } from '@/features/users/users.module';
+import { HealthModule } from '@/health/health.module';
 import { JwtAuthGuard } from '@/shared/guards';
 
 @Module({
@@ -51,10 +52,51 @@ import { JwtAuthGuard } from '@/shared/guards';
       sortSchema: true,
       playground: process.env.NODE_ENV !== 'production',
       introspection: true,
-      context: ({ req, res }: { req: Request; res: Response }) => ({
-        req,
-        res,
-      }),
+      subscriptions: {
+        'graphql-ws': {
+          onConnect: (context: any) => {
+            const { connectionParams, extra } = context;
+            // Extract JWT token from connection params
+            if (connectionParams?.authorization) {
+              extra.token = connectionParams.authorization.replace('Bearer ', '');
+            }
+          },
+          onSubscribe: (context: any, message: any) => {
+            const { extra } = context;
+            // Add token to context for authentication
+            return {
+              ...message,
+              extra,
+            };
+          },
+        },
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams: any) => {
+            // Extract JWT token from connection params for legacy transport
+            if (connectionParams?.authorization) {
+              return {
+                token: connectionParams.authorization.replace('Bearer ', ''),
+              };
+            }
+            return {};
+          },
+        },
+      },
+      context: ({ req, res, connection }: { req: Request; res: Response; connection?: any }) => {
+        if (connection) {
+          // WebSocket connection context
+          return {
+            req: {
+              ...connection.context,
+              headers: {
+                authorization: connection.context.token ? `Bearer ${connection.context.token}` : '',
+              },
+            },
+          };
+        }
+        // HTTP request context
+        return { req, res };
+      },
       formatError: (
         formattedError: GraphQLFormattedError,
       ): GraphQLFormattedError => {
@@ -88,6 +130,7 @@ import { JwtAuthGuard } from '@/shared/guards';
     RecipesModule,
     SocialModule,
     SearchModule,
+    NotificationsModule,
   ],
   providers: [
     {
@@ -96,4 +139,4 @@ import { JwtAuthGuard } from '@/shared/guards';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

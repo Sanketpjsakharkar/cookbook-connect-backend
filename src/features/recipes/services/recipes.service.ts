@@ -11,18 +11,26 @@ export class RecipesService {
         private recipesRepository: RecipesRepository,
         private prismaService: PrismaService,
         private elasticsearchSyncService?: any, // Optional to avoid circular dependency
+        private notificationsService?: any, // Optional to avoid circular dependency
     ) { }
 
     async create(authorId: string, createRecipeInput: CreateRecipeInput) {
         const recipe = await this.recipesRepository.create(authorId, createRecipeInput);
-        
+
         // Sync with Elasticsearch asynchronously
         if (this.elasticsearchSyncService) {
             this.elasticsearchSyncService.syncRecipe(recipe.id).catch((error: any) => {
                 console.error('Failed to sync recipe to Elasticsearch:', error);
             });
         }
-        
+
+        // Send real-time notification asynchronously
+        if (this.notificationsService && recipe.isPublic) {
+            this.notificationsService.createRecipeNotification(recipe.id, authorId).catch((error: any) => {
+                console.error('Failed to send recipe notification:', error);
+            });
+        }
+
         return this.mapRecipeWithStats(recipe);
     }
 
@@ -54,14 +62,14 @@ export class RecipesService {
         }
 
         const recipe = await this.recipesRepository.update(id, updateRecipeInput);
-        
+
         // Sync with Elasticsearch asynchronously
         if (this.elasticsearchSyncService && recipe) {
             this.elasticsearchSyncService.syncRecipe(recipe.id).catch((error: any) => {
                 console.error('Failed to sync updated recipe to Elasticsearch:', error);
             });
         }
-        
+
         return this.mapRecipeWithStats(recipe);
     }
 
@@ -76,14 +84,14 @@ export class RecipesService {
         }
 
         await this.recipesRepository.delete(id);
-        
+
         // Remove from Elasticsearch asynchronously
         if (this.elasticsearchSyncService) {
             this.elasticsearchSyncService.deleteRecipe(id).catch((error: any) => {
                 console.error('Failed to delete recipe from Elasticsearch:', error);
             });
         }
-        
+
         return true;
     }
 
