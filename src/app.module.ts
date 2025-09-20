@@ -10,9 +10,11 @@ import { join } from 'path';
 
 // Core modules
 import {
+  aiConfig,
   appConfig,
   databaseConfig,
   elasticsearchConfig,
+  geminiConfig,
   jwtConfig,
   openaiConfig,
   redisConfig,
@@ -20,7 +22,7 @@ import {
 import { DatabaseModule } from '@/core/database';
 
 // Feature modules
-import { AIModule } from '@/features/ai-assistant/ai.module';
+import { AIAssistantModule } from '@/features/ai-assistant/ai-assistant.module';
 import { AuthModule } from '@/features/auth/auth.module';
 import { NotificationsModule } from '@/features/notifications/notifications.module';
 import { RecipesModule } from '@/features/recipes/recipes.module';
@@ -36,12 +38,14 @@ import { JwtAuthGuard } from '@/shared/guards';
     ConfigModule.forRoot({
       isGlobal: true,
       load: [
+        aiConfig,
         appConfig,
         databaseConfig,
         jwtConfig,
         elasticsearchConfig,
         redisConfig,
         openaiConfig,
+        geminiConfig,
       ],
       envFilePath: ['.env.local', '.env'],
     }),
@@ -132,7 +136,7 @@ import { JwtAuthGuard } from '@/shared/guards';
     SocialModule,
     SearchModule,
     NotificationsModule,
-    AIModule,
+    AIAssistantModule,
   ],
   providers: [
     {

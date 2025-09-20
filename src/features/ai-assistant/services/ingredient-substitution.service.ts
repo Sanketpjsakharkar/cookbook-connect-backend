@@ -1,5 +1,5 @@
 import { PrismaService } from '@/core/database';
-import { OpenAIService } from '@/core/infrastructure/external-apis/openai';
+import { AIService } from '@/core/infrastructure/external-apis/ai';
 import { Injectable, Logger } from '@nestjs/common';
 import { SubstitutionPrompt } from '../prompts/substitution.prompt';
 
@@ -38,7 +38,7 @@ export class IngredientSubstitutionService {
 
     constructor(
         private prismaService: PrismaService,
-        private openAIService: OpenAIService,
+        private aiService: AIService,
     ) { }
 
     async getSubstitutions(
@@ -91,7 +91,7 @@ export class IngredientSubstitutionService {
 
             const systemMessage = SubstitutionPrompt.getSystemMessage();
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 systemMessage,
                 {
@@ -141,7 +141,7 @@ export class IngredientSubstitutionService {
                 recipeType,
             );
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 SubstitutionPrompt.getSystemMessage(),
                 {
@@ -212,7 +212,7 @@ export class IngredientSubstitutionService {
                 dietaryNeed as any,
             );
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 SubstitutionPrompt.getSystemMessage(),
                 {
@@ -314,7 +314,7 @@ export class IngredientSubstitutionService {
                 createdAt: new Date(),
             };
 
-        } catch (error) {
+        } catch {
             // Fallback: extract substitutions from text
             this.logger.warn('Failed to parse JSON response, attempting text extraction');
 

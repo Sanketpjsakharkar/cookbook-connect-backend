@@ -1,5 +1,6 @@
 import { PrismaService } from '@/core/database';
 import { ElasticsearchService } from '@/core/infrastructure/elasticsearch';
+import { CuisineType, RecipeDifficulty } from '@/shared/enums';
 import { Injectable, Logger } from '@nestjs/common';
 import { SearchQueryInput } from '../dto/search-query.dto';
 import { AutocompleteResult, SearchResult } from '../dto/search-result.dto';
@@ -11,7 +12,7 @@ export class SearchService {
   constructor(
     private elasticsearchService: ElasticsearchService,
     private prismaService: PrismaService,
-  ) {}
+  ) { }
 
   async searchRecipes(searchQuery: SearchQueryInput): Promise<SearchResult> {
     const startTime = Date.now();
@@ -28,7 +29,7 @@ export class SearchService {
       });
 
       const recipeIds = response.hits.hits.map(
-        (hit: { _source: { id: string } }) => hit._source.id,
+        (hit: any) => hit._source.id,
       );
 
       // Fetch full recipe data from database to ensure consistency
@@ -106,7 +107,7 @@ export class SearchService {
 
       const response = await this.elasticsearchService.search('recipes', query);
       const recipeIds = response.hits.hits.map(
-        (hit: { _source: { id: string } }) => hit._source.id,
+        (hit: any) => hit._source.id,
       );
       const recipes = await this.fetchRecipesFromDatabase(recipeIds);
 
@@ -179,7 +180,7 @@ export class SearchService {
       );
 
       const suggestions = response.hits.hits.map(
-        (hit: { _source: { name: string } }) => hit._source.name,
+        (hit: any) => hit._source.name,
       );
       const took = Date.now() - startTime;
 
@@ -351,20 +352,26 @@ export class SearchService {
     const recipeMap = new Map(recipes.map(recipe => [recipe.id, recipe]));
     const orderedRecipes = recipeIds
       .map(id => recipeMap.get(id))
-      .filter(Boolean)
+      .filter((recipe): recipe is NonNullable<typeof recipe> => recipe !== undefined)
       .map(recipe => {
         const avgRating =
-          recipe!.ratings.length > 0
-            ? recipe!.ratings.reduce((sum, rating) => sum + rating.value, 0) /
-              recipe!.ratings.length
+          recipe.ratings.length > 0
+            ? recipe.ratings.reduce((sum, rating) => sum + rating.value, 0) /
+            recipe.ratings.length
             : null;
 
         return {
           ...recipe,
+          description: recipe.description || undefined,
+          cuisine: recipe.cuisine as CuisineType || undefined,
+          difficulty: recipe.difficulty as RecipeDifficulty || undefined,
+          cookingTime: recipe.cookingTime || undefined,
+          servings: recipe.servings || undefined,
+          imageUrl: recipe.imageUrl || undefined,
           avgRating,
-          ratingsCount: recipe!._count.ratings,
-          commentsCount: recipe!._count.comments,
-        };
+          ratingsCount: recipe._count.ratings,
+          commentsCount: recipe._count.comments,
+        } as any;
       });
 
     return orderedRecipes;
