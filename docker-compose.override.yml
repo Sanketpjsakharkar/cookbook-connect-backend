@@ -1,0 +1,25 @@
+# Development overrides for docker-compose.yml
+# This file is automatically loaded by docker-compose
+
+services:
+  backend:
+    # Use development target for hot reloading
+    build:
+      target: development
+    # Override command for development with watch mode
+    command: ['pnpm', 'start:dev']
+    # Additional development environment variables
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+    # Mount additional files for development
+    volumes:
+      # Mount source code for hot reloading
+      - ./src:/app/src
+      - ./prisma:/app/prisma
+      - ./package.json:/app/package.json
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./nest-cli.json:/app/nest-cli.json
+      - ./.env:/app/.env
+      # Preserve node_modules in container (don't mount from host)
+      - /app/node_modules

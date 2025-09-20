@@ -28,6 +28,7 @@
     "es:setup": "ts-node src/cli/elasticsearch-setup.ts",
     "test:realtime": "ts-node src/cli/test-realtime.ts",
     "test:ai": "ts-node src/cli/test-ai-features.ts",
+    "postman:generate": "ts-node scripts/generate-postman.ts",
     "prepare": "husky install"
   },
   "keywords": [],
@@ -36,7 +37,7 @@
   "packageManager": "pnpm@10.10.0",
   "dependencies": {
     "@apollo/server": "^4.12.2",
-    "@elastic/elasticsearch": "^9.1.1",
+    "@elastic/elasticsearch": "^8.15.0",
     "@nestjs/apollo": "^13.1.0",
     "@nestjs/common": "^11.1.6",
     "@nestjs/config": "^4.0.2",
@@ -49,6 +50,7 @@
     "@nestjs/throttler": "^6.4.0",
     "@prisma/client": "^6.16.2",
     "@types/ioredis": "^5.0.0",
+    "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
@@ -71,6 +73,7 @@
     "@eslint/js": "^9.36.0",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/schematics": "^11.0.7",
+    "@nestjs/testing": "^11.1.6",
     "@types/bcryptjs": "^3.0.0",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
@@ -91,6 +94,7 @@
     "prisma": "^6.16.2",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.4",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2"
   }

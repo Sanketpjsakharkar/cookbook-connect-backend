@@ -56,6 +56,10 @@ export class AuthService {
         username: true,
         firstName: true,
         lastName: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
@@ -100,6 +104,10 @@ export class AuthService {
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
+        role: user.role,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
     };
   }

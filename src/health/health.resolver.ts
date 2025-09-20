@@ -1,3 +1,4 @@
+import { Public } from '@/shared/decorators';
 import { Query, Resolver } from '@nestjs/graphql';
 import { HealthService } from './health.service';
 
@@ -5,6 +6,7 @@ import { HealthService } from './health.service';
 export class HealthResolver {
   constructor(private readonly healthService: HealthService) {}
 
+  @Public()
   @Query(() => String, { description: 'Health check query' })
   async health(): Promise<string> {
     const result = await this.healthService.checkHealth();

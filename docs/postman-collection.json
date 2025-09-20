@@ -1,0 +1,1204 @@
+{
+  "info": {
+    "name": "CookBook Connect GraphQL API",
+    "description": "GraphQL API collection for CookBook Connect - Recipe sharing platform",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": {
+      "token": "{{jwt_token}}"
+    }
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation RegisterUser($input: RegisterInput!) {\n  register(input: $input) {\n    accessToken\n    refreshToken\n    user {\n      id\n      email\n      username\n      firstName\n      lastName\n      role\n      isActive\n      createdAt\n      updatedAt\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"email\": \"john.doe@example.com\",\n    \"username\": \"john_doe123\",\n    \"password\": \"SecurePass123\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation LoginUser($input: LoginInput!) {\n  login(input: $input) {\n    accessToken\n    refreshToken\n    user {\n      id\n      email\n      username\n      firstName\n      lastName\n      role\n      isActive\n    }\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"emailOrUsername\": \"john.doe@example.com\",\n    \"password\": \"SecurePass123\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetCurrentUser {\n  me {\n    id\n    email\n    username\n    firstName\n    lastName\n    bio\n    avatar\n    role\n    isActive\n    recipesCount\n    followersCount\n    followingCount\n    createdAt\n    updatedAt\n  }\n}",
+                "variables": "{}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetUser($id: ID!) {\n  user(id: $id) {\n    id\n    email\n    username\n    firstName\n    lastName\n    bio\n    avatar\n    role\n    isActive\n    recipesCount\n    followersCount\n    followingCount\n    createdAt\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"user-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetUsers {\n  users {\n    id\n    username\n    firstName\n    lastName\n    bio\n    avatar\n    recipesCount\n    followersCount\n    followingCount\n    createdAt\n  }\n}",
+                "variables": "{}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateUser($input: UpdateUserInput!) {\n  updateUser(updateUserInput: $input) {\n    id\n    firstName\n    lastName\n    bio\n    avatar\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"firstName\": \"John Updated\",\n    \"lastName\": \"Doe Updated\",\n    \"bio\": \"Updated bio for John Doe\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Users with Most Followed Recipes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetMostFollowedUsers($limit: Float) {\n  mostFollowedUsers(limit: $limit) {\n    id\n    username\n    firstName\n    lastName\n    recipesCount\n    followersCount\n    followingCount\n  }\n}",
+                "variables": "{\n  \"limit\": 10\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recipes",
+      "item": [
+        {
+          "name": "Create Recipe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateRecipe($input: CreateRecipeInput!) {\n  createRecipe(input: $input) {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    cookingTime\n    servings\n    imageUrl\n    ingredients {\n      id\n      name\n      quantity\n      unit\n    }\n    instructions {\n      id\n      stepNumber\n      description\n    }\n    author {\n      id\n      username\n      firstName\n      lastName\n    }\n    avgRating\n    ratingsCount\n    commentsCount\n    createdAt\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"title\": \"Delicious Pasta Carbonara\",\n    \"description\": \"A classic Italian pasta dish with eggs, cheese, and pancetta\",\n    \"cuisine\": \"ITALIAN\",\n    \"difficulty\": \"MEDIUM\",\n    \"cookingTime\": 35,\n    \"servings\": 4,\n    \"imageUrl\": \"https://example.com/pasta-carbonara.jpg\",\n    \"ingredients\": [\n      {\n        \"name\": \"Spaghetti\",\n        \"quantity\": \"400\",\n        \"unit\": \"grams\"\n      },\n      {\n        \"name\": \"Pancetta\",\n        \"quantity\": \"150\",\n        \"unit\": \"grams\"\n      },\n      {\n        \"name\": \"Eggs\",\n        \"quantity\": \"3\",\n        \"unit\": \"pieces\"\n      },\n      {\n        \"name\": \"Parmesan Cheese\",\n        \"quantity\": \"100\",\n        \"unit\": \"grams\"\n      }\n    ],\n    \"instructions\": [\n      {\n        \"stepNumber\": 1,\n        \"description\": \"Boil salted water in a large pot and cook spaghetti until al dente\"\n      },\n      {\n        \"stepNumber\": 2,\n        \"description\": \"Cook pancetta in a large pan until crispy\"\n      },\n      {\n        \"stepNumber\": 3,\n        \"description\": \"Beat eggs with grated Parmesan cheese in a bowl\"\n      },\n      {\n        \"stepNumber\": 4,\n        \"description\": \"Drain pasta and mix with pancetta, then add egg mixture off heat\"\n      }\n    ]\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Recipe by ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetRecipe($id: ID!) {\n  recipe(id: $id) {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    cookingTime\n    servings\n    imageUrl\n    ingredients {\n      id\n      name\n      quantity\n      unit\n    }\n    instructions {\n      id\n      stepNumber\n      description\n    }\n    author {\n      id\n      username\n      firstName\n      lastName\n    }\n    avgRating\n    ratingsCount\n    commentsCount\n    createdAt\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Recipes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetRecipes($take: Float, $skip: Float) {\n  recipes(take: $take, skip: $skip) {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    cookingTime\n    servings\n    imageUrl\n    author {\n      id\n      username\n      firstName\n      lastName\n    }\n    avgRating\n    ratingsCount\n    commentsCount\n    createdAt\n  }\n}",
+                "variables": "{\n  \"take\": 10,\n  \"skip\": 0\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Recipe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateRecipe($id: ID!, $input: UpdateRecipeInput!) {\n  updateRecipe(id: $id, input: $input) {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    cookingTime\n    servings\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"id\": \"recipe-id-here\",\n  \"input\": {\n    \"title\": \"Updated Pasta Carbonara\",\n    \"description\": \"An updated classic Italian pasta dish\",\n    \"cookingTime\": 30\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Recipe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteRecipe($id: ID!) {\n  deleteRecipe(id: $id) {\n    id\n    title\n  }\n}",
+                "variables": "{\n  \"id\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Recipes with Average Ratings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetRecipesWithAvgRatings {\n  recipesWithAvgRatings {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    author {\n      id\n      username\n    }\n    avgRating\n    ratingsCount\n    commentsCount\n  }\n}",
+                "variables": "{}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Recipe Recommendations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetRecipeRecommendations($userId: ID!) {\n  recipeRecommendations(userId: $userId) {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    author {\n      id\n      username\n    }\n    avgRating\n    ratingsCount\n  }\n}",
+                "variables": "{\n  \"userId\": \"user-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Recipes by Ingredient Matches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetRecipesByIngredients($ingredients: [String!]!) {\n  recipesByIngredients(ingredients: $ingredients) {\n    id\n    title\n    description\n    matchedIngredients\n    totalIngredients\n    matchPercentage\n    author {\n      id\n      username\n    }\n    avgRating\n  }\n}",
+                "variables": "{\n  \"ingredients\": [\n    \"pasta\",\n    \"cheese\",\n    \"eggs\"\n  ]\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Social Features",
+      "item": [
+        {
+          "name": "Create or Update Rating",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateOrUpdateRating($input: CreateRatingInput!) {\n  createOrUpdateRating(createRatingInput: $input) {\n    id\n    value\n    recipe {\n      id\n      title\n      avgRating\n      ratingsCount\n    }\n    user {\n      id\n      username\n    }\n    createdAt\n    updatedAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"value\": 5\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Comment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateComment($input: CreateCommentInput!) {\n  createComment(createCommentInput: $input) {\n    id\n    content\n    recipe {\n      id\n      title\n      commentsCount\n    }\n    author {\n      id\n      username\n      firstName\n      lastName\n    }\n    createdAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"content\": \"This recipe looks amazing! The instructions are very clear and easy to follow.\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Follow User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation FollowUser($userId: ID!) {\n  followUser(userId: $userId) {\n    id\n    follower {\n      id\n      username\n    }\n    following {\n      id\n      username\n    }\n    createdAt\n  }\n}",
+                "variables": "{\n  \"userId\": \"user-id-to-follow\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Unfollow User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UnfollowUser($userId: ID!) {\n  unfollowUser(userId: $userId)\n}",
+                "variables": "{\n  \"userId\": \"user-id-to-unfollow\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User Feed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetUserFeed {\n  userFeed {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    imageUrl\n    author {\n      id\n      username\n      firstName\n      lastName\n    }\n    avgRating\n    ratingsCount\n    commentsCount\n    createdAt\n  }\n}",
+                "variables": "{}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Recipe Comments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetRecipeComments($recipeId: ID!) {\n  recipe(id: $recipeId) {\n    id\n    title\n    comments {\n      id\n      content\n      author {\n        id\n        username\n        firstName\n        lastName\n      }\n      createdAt\n    }\n  }\n}",
+                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Recipe Ratings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetRecipeRatings($recipeId: ID!) {\n  recipe(id: $recipeId) {\n    id\n    title\n    ratings {\n      id\n      value\n      user {\n        id\n        username\n      }\n      createdAt\n    }\n    avgRating\n    ratingsCount\n  }\n}",
+                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search & Discovery",
+      "item": [
+        {
+          "name": "Search Recipes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query SearchRecipes($input: SearchQueryInput!) {\n  searchRecipes(input: $input) {\n    recipes {\n      id\n      title\n      description\n      cuisine\n      difficulty\n      cookingTime\n      imageUrl\n      avgRating\n      author {\n        id\n        username\n      }\n    }\n    total\n    maxScore\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"query\": \"pasta carbonara\",\n    \"cuisines\": [\"ITALIAN\"],\n    \"difficulties\": [\"MEDIUM\"],\n    \"maxCookingTime\": 30,\n    \"minRating\": 4,\n    \"take\": 10,\n    \"skip\": 0\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Cook With What I Have",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query CookWithWhatIHave($ingredients: [String!]!) {\n  cookWithWhatIHave(ingredients: $ingredients) {\n    recipes {\n      id\n      title\n      description\n      matchedIngredients\n      totalIngredients\n      matchPercentage\n      author {\n        id\n        username\n      }\n      avgRating\n    }\n    total\n  }\n}",
+                "variables": "{\n  \"ingredients\": [\n    \"pasta\",\n    \"tomato\",\n    \"cheese\",\n    \"garlic\",\n    \"basil\"\n  ]\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Autocomplete Ingredients",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query AutocompleteIngredients($query: String!) {\n  autocompleteIngredients(query: $query)\n}",
+                "variables": "{\n  \"query\": \"tom\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Advanced Recipe Search",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query AdvancedRecipeSearch($input: SearchQueryInput!) {\n  searchRecipes(input: $input) {\n    recipes {\n      id\n      title\n      description\n      cuisine\n      difficulty\n      cookingTime\n      servings\n      ingredients {\n        name\n        quantity\n        unit\n      }\n      author {\n        id\n        username\n        firstName\n        lastName\n      }\n      avgRating\n      ratingsCount\n      commentsCount\n    }\n    total\n    maxScore\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"query\": \"chicken\",\n    \"cuisines\": [\"ASIAN\"],\n    \"difficulties\": [\"EASY\"],\n    \"maxCookingTime\": 45,\n    \"minServings\": 2,\n    \"maxServings\": 6,\n    \"minRating\": 3.5,\n    \"take\": 10,\n    \"skip\": 0\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Features",
+      "item": [
+        {
+          "name": "Analyze Recipe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query AnalyzeRecipe($recipeId: ID!) {\n  analyzeRecipe(recipeId: $recipeId) {\n    improvements {\n      category\n      suggestion\n      reason\n      importance\n    }\n    complexity {\n      level\n      factors\n      estimatedTime\n    }\n    tips\n  }\n}",
+                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Ingredient Substitutions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetSubstitutions($input: SubstitutionRequestInput!) {\n  getIngredientSubstitutions(input: $input) {\n    ingredient\n    substitutions {\n      name\n      ratio\n      notes\n      suitability\n    }\n    dietaryNeed\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"ingredient\": \"butter\",\n    \"dietaryNeed\": \"VEGAN\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Cooking Tips",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetCookingTips($input: CookingTipsRequestInput!) {\n  getCookingTips(input: $input) {\n    tips {\n      category\n      tip\n      importance\n    }\n    skillLevel\n    estimatedTime\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"skillLevel\": \"BEGINNER\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Technique Guidance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetTechniqueGuidance($input: CookingTipsRequestInput!) {\n  getTechniqueGuidance(input: $input) {\n    technique\n    description\n    tips\n    difficulty\n    estimatedTime\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"skillLevel\": \"INTERMEDIATE\"\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Batch Analyze Recipes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation BatchAnalyzeRecipes($recipeIds: [ID!]!) {\n  batchAnalyzeRecipes(recipeIds: $recipeIds) {\n    recipeId\n    improvements {\n      category\n      suggestion\n      reason\n      importance\n    }\n    complexity {\n      level\n      factors\n      estimatedTime\n    }\n    tips\n  }\n}",
+                "variables": "{\n  \"recipeIds\": [\n    \"recipe-id-1\",\n    \"recipe-id-2\",\n    \"recipe-id-3\"\n  ]\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Batch Get Substitutions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation BatchGetSubstitutions($requests: [SubstitutionRequestInput!]!) {\n  batchGetSubstitutions(requests: $requests) {\n    ingredient\n    substitutions {\n      name\n      ratio\n      notes\n      suitability\n    }\n    dietaryNeed\n  }\n}",
+                "variables": "{\n  \"requests\": [\n    {\n      \"recipeId\": \"recipe-id-here\",\n      \"ingredient\": \"milk\",\n      \"dietaryNeed\": \"DAIRY_FREE\"\n    },\n    {\n      \"recipeId\": \"recipe-id-here\",\n      \"ingredient\": \"eggs\",\n      \"dietaryNeed\": \"VEGAN\"\n    }\n  ]\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Real-time Subscriptions",
+      "item": [
+        {
+          "name": "Subscribe to User Feed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "subscription UserFeedSubscription($userId: ID!) {\n  userFeed(userId: $userId) {\n    type\n    data {\n      ... on Recipe {\n        id\n        title\n        description\n        author {\n          id\n          username\n        }\n        createdAt\n      }\n      ... on Comment {\n        id\n        content\n        recipe {\n          id\n          title\n        }\n        author {\n          id\n          username\n        }\n        createdAt\n      }\n      ... on Rating {\n        id\n        value\n        recipe {\n          id\n          title\n        }\n        user {\n          id\n          username\n        }\n        createdAt\n      }\n    }\n  }\n}",
+                "variables": "{\n  \"userId\": \"user-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Subscribe to Recipe Activity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "subscription RecipeActivitySubscription($recipeId: ID!) {\n  recipeActivity(recipeId: $recipeId) {\n    type\n    data {\n      ... on Comment {\n        id\n        content\n        author {\n          id\n          username\n        }\n        createdAt\n      }\n      ... on Rating {\n        id\n        value\n        user {\n          id\n          username\n        }\n        createdAt\n      }\n    }\n  }\n}",
+                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Subscribe to Global Activity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "subscription GlobalActivitySubscription {\n  globalActivity {\n    type\n    data {\n      ... on Recipe {\n        id\n        title\n        author {\n          id\n          username\n        }\n        createdAt\n      }\n      ... on Comment {\n        id\n        content\n        recipe {\n          id\n          title\n        }\n        author {\n          id\n          username\n        }\n        createdAt\n      }\n    }\n  }\n}",
+                "variables": "{}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Subscribe to New Recipes from Followed Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "subscription NewRecipesFromFollowedUsers($userId: ID!) {\n  newRecipesFromFollowedUsers(userId: $userId) {\n    id\n    title\n    description\n    cuisine\n    difficulty\n    author {\n      id\n      username\n      firstName\n      lastName\n    }\n    createdAt\n  }\n}",
+                "variables": "{\n  \"userId\": \"user-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Subscribe to New Comments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "subscription NewComments($recipeId: ID!) {\n  newComments(recipeId: $recipeId) {\n    id\n    content\n    author {\n      id\n      username\n      firstName\n      lastName\n    }\n    createdAt\n  }\n}",
+                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        },
+        {
+          "name": "Subscribe to New Ratings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "subscription NewRatings($recipeId: ID!) {\n  newRatings(recipeId: $recipeId) {\n    id\n    value\n    user {\n      id\n      username\n    }\n    createdAt\n  }\n}",
+                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GraphQL Health Check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query HealthCheck {\n  health\n}",
+                "variables": "{}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_endpoint}}",
+              "host": ["{{graphql_endpoint}}"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "graphql_endpoint",
+      "value": "{{base_url}}/graphql",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "your-jwt-token-here",
+      "type": "string"
+    }
+  ]
+}
