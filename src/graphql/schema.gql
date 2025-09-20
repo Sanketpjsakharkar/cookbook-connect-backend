@@ -1,0 +1,452 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+enum AIRequestType {
+  COOKING_TIPS
+  INGREDIENT_SUBSTITUTION
+  QUICK_SUGGESTIONS
+  RECIPE_ANALYSIS
+}
+
+type AIResponse {
+  cached: Boolean!
+  createdAt: DateTime!
+  data: String
+  message: String
+  responseTime: Float!
+  success: Boolean!
+  type: AIRequestType!
+}
+
+type AIUsageMetrics {
+  costToday: Float!
+  requestsToday: Float!
+  tokensToday: Float!
+  totalCost: Float!
+  totalRequests: Float!
+  totalTokens: Float!
+}
+
+type ActivityFeedItem {
+  actor: User!
+  comment: Comment
+  createdAt: DateTime!
+  id: ID!
+  message: String!
+  rating: Rating
+  recipe: Recipe
+  type: NotificationType!
+}
+
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
+type AutocompleteResult {
+  suggestions: [String!]!
+  took: Int!
+}
+
+type Comment {
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+  recipe: Recipe!
+  recipeId: ID!
+  updatedAt: DateTime!
+  user: User!
+  userId: ID!
+}
+
+type CookingGuidance {
+  commonMistakes: [String!]!
+  createdAt: DateTime!
+  guidanceId: ID!
+  keyTechniques: [String!]!
+  recipeId: ID!
+  successIndicators: [String!]!
+  tips: [CookingTip!]!
+}
+
+type CookingTip {
+  category: CookingTipCategory!
+  importance: ImportanceLevel!
+  skillLevel: SkillLevel!
+  tip: String!
+}
+
+enum CookingTipCategory {
+  COOKING
+  EQUIPMENT
+  PREPARATION
+  SAFETY
+  STORAGE
+  TIMING
+  TROUBLESHOOTING
+}
+
+input CookingTipsInput {
+  recipeId: ID!
+}
+
+input CreateCommentInput {
+  content: String!
+  recipeId: ID!
+}
+
+input CreateIngredientInput {
+  name: String!
+  notes: String
+  quantity: Float!
+  unit: String!
+}
+
+input CreateInstructionInput {
+  description: String!
+  stepNumber: Int!
+}
+
+input CreateRatingInput {
+  recipeId: ID!
+  value: Int!
+}
+
+input CreateRecipeInput {
+  cookingTime: Int
+  cuisine: CuisineType
+  description: String
+  difficulty: RecipeDifficulty
+  imageUrl: String
+  ingredients: [CreateIngredientInput!]!
+  instructions: [CreateInstructionInput!]!
+  isPublic: Boolean! = true
+  servings: Int
+  title: String!
+}
+
+"""Type of cuisine"""
+enum CuisineType {
+  AMERICAN
+  CHINESE
+  FRENCH
+  INDIAN
+  ITALIAN
+  JAPANESE
+  MEDITERRANEAN
+  MEXICAN
+  OTHER
+  THAI
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum DietaryRestriction {
+  DAIRY_FREE
+  GLUTEN_FREE
+  HALAL
+  KETO
+  KOSHER
+  LOW_SODIUM
+  LOW_SUGAR
+  NUT_FREE
+  PALEO
+  VEGAN
+  VEGETARIAN
+}
+
+type Follow {
+  createdAt: DateTime!
+  follower: User!
+  followerId: ID!
+  following: User!
+  followingId: ID!
+  id: ID!
+}
+
+enum ImportanceLevel {
+  HIGH
+  LOW
+  MEDIUM
+}
+
+type Ingredient {
+  id: ID!
+  name: String!
+  notes: String
+  quantity: Float!
+  recipeId: ID!
+  unit: String!
+}
+
+type IngredientSubstitution {
+  impact: String!
+  notes: String!
+  original: String!
+  ratio: String!
+  substitute: String!
+}
+
+type Instruction {
+  description: String!
+  id: ID!
+  recipeId: ID!
+  stepNumber: Int!
+}
+
+input LoginInput {
+  emailOrUsername: String!
+  password: String!
+}
+
+type Mutation {
+  createComment(input: CreateCommentInput!): Comment!
+  createRecipe(input: CreateRecipeInput!): Recipe!
+  deleteComment(id: ID!): Boolean!
+  deleteRating(recipeId: ID!): Boolean!
+  deleteRecipe(id: ID!): Boolean!
+  followUser(userId: ID!): Follow!
+  generateDietaryAlternatives(recipeId: String!, restrictions: [DietaryRestriction!]!): AIResponse!
+  generateRecipeInsights(recipeId: String!): AIResponse!
+  login(input: LoginInput!): AuthResponse!
+  rateRecipe(input: CreateRatingInput!): Rating!
+  register(input: RegisterInput!): AuthResponse!
+  unfollowUser(userId: ID!): Boolean!
+  updateComment(content: String!, id: ID!): Comment!
+  updateProfile(input: UpdateUserInput!): User!
+  updateRecipe(id: ID!, input: UpdateRecipeInput!): Recipe!
+}
+
+"""Types of notifications that can be sent to users"""
+enum NotificationType {
+  COMMENT_CREATED
+  RATING_CREATED
+  RECIPE_CREATED
+  USER_FOLLOWED
+}
+
+type Query {
+  analyzeRecipe(input: RecipeAnalysisInput!): RecipeAnalysis
+  autocompleteIngredients(limit: Int = 10, query: String!): AutocompleteResult!
+  cookWithWhatIHave(ingredients: [String!]!, limit: Int = 20): SearchResult!
+  getAIUsageMetrics: AIUsageMetrics!
+  getCommonSubstitutions: String
+  getCookingTips(input: CookingTipsInput!): CookingGuidance
+  getDietarySubstitutions(dietaryNeed: DietaryRestriction!, recipeId: String!): SubstitutionResult
+  getIngredientSubstitutions(input: SubstitutionRequestInput!): SubstitutionResult
+  getQuickSuggestions(input: QuickSuggestionsInput!): [String!]
+  getQuickTips(recipeId: String!): [String!]
+  getRecipeComplexity(recipeId: String!): String
+  getSingleIngredientSubstitution(input: SingleIngredientSubstitutionInput!): [IngredientSubstitution!]
+  getTechniqueGuidance(input: TechniqueGuidanceInput!): [CookingTip!]
+  getTroubleshootingAdvice(commonIssues: [String!]!, recipeTitle: String!): [String!]
+
+  """Health check query"""
+  health: String!
+  isAIServiceHealthy: Boolean!
+  isFollowing(userId: ID!): Boolean!
+  me: User!
+  mostFollowedUsers(limit: Float = 10): [User!]!
+  myFeed(skip: Float, take: Float): [Recipe!]!
+  recipe(id: ID!): Recipe!
+  recipeComments(recipeId: ID!, skip: Float, take: Float): [Comment!]!
+  recipeRatings(recipeId: ID!, skip: Float, take: Float): [Rating!]!
+  recipes(filter: RecipeFilterInput, skip: Float, take: Float): [Recipe!]!
+  recipesByIngredients(ingredients: [String!]!, limit: Float = 20): [Recipe!]!
+  recommendedRecipes(limit: Float = 10): [Recipe!]!
+  searchRecipes(input: SearchQueryInput!): SearchResult!
+  user(id: ID!): User!
+  userByUsername(username: String!): User!
+  userFollowers(skip: Float, take: Float, userId: ID!): [Follow!]!
+  userFollowing(skip: Float, take: Float, userId: ID!): [Follow!]!
+  users(skip: Float, take: Float): [User!]!
+}
+
+input QuickSuggestionsInput {
+  recipeId: ID!
+}
+
+type Rating {
+  createdAt: DateTime!
+  id: ID!
+  recipe: Recipe!
+  recipeId: ID!
+  updatedAt: DateTime!
+  user: User!
+  userId: ID!
+  value: Int!
+}
+
+type Recipe {
+  author: User!
+  authorId: ID!
+  avgRating: Float
+  commentsCount: Int!
+  cookingTime: Int
+  createdAt: DateTime!
+  cuisine: CuisineType
+  description: String
+  difficulty: RecipeDifficulty
+  id: ID!
+  imageUrl: String
+  ingredients: [Ingredient!]!
+  instructions: [Instruction!]!
+  isPublic: Boolean!
+  ratingsCount: Int!
+  servings: Int
+  title: String!
+  updatedAt: DateTime!
+}
+
+type RecipeAnalysis {
+  analysisId: ID!
+  createdAt: DateTime!
+  improvements: [RecipeImprovement!]!
+  overallRating: Float!
+  recipeId: ID!
+  summary: String!
+}
+
+input RecipeAnalysisInput {
+  recipeId: ID!
+}
+
+"""Recipe difficulty level"""
+enum RecipeDifficulty {
+  EASY
+  HARD
+  MEDIUM
+}
+
+input RecipeFilterInput {
+  authorId: String
+  cuisines: [CuisineType!]
+  difficulties: [RecipeDifficulty!]
+  ingredients: [String!]
+  maxCookingTime: Int
+  search: String
+}
+
+type RecipeImprovement {
+  category: String!
+  reason: String!
+  suggestion: String!
+}
+
+input RegisterInput {
+  email: String!
+  firstName: String
+  lastName: String
+  password: String!
+  username: String!
+}
+
+input SearchQueryInput {
+  authorId: String
+  cuisines: [CuisineType!]
+  difficulties: [RecipeDifficulty!]
+  ingredients: [String!]
+  maxCookingTime: Int
+  maxServings: Int
+  minServings: Int
+  query: String
+  skip: Int = 0
+  take: Int = 20
+}
+
+type SearchResult {
+  maxScore: Float
+  recipes: [Recipe!]!
+  took: Int!
+  total: Int!
+}
+
+input SingleIngredientSubstitutionInput {
+  ingredient: String!
+  quantity: String!
+  reason: String!
+  recipeType: String
+  unit: String!
+}
+
+enum SkillLevel {
+  ADVANCED
+  BEGINNER
+  INTERMEDIATE
+}
+
+type Subscription {
+  globalActivity: ActivityFeedItem!
+  newCommentOnRecipe(recipeId: ID!): ActivityFeedItem!
+  newRatingOnRecipe(recipeId: ID!): ActivityFeedItem!
+  newRecipeFromFollowedUsers: ActivityFeedItem!
+  recipeActivity(recipeId: ID!): ActivityFeedItem!
+  userFeed: ActivityFeedItem!
+}
+
+input SubstitutionRequestInput {
+  recipeId: ID!
+  restrictions: [DietaryRestriction!]!
+}
+
+type SubstitutionResult {
+  createdAt: DateTime!
+  difficultyChange: String!
+  overallNotes: String!
+  requestId: ID!
+  substitutions: [IngredientSubstitution!]!
+}
+
+input TechniqueGuidanceInput {
+  difficulty: String!
+  techniques: [String!]!
+}
+
+input UpdateRecipeInput {
+  cookingTime: Int
+  cuisine: CuisineType
+  description: String
+  difficulty: RecipeDifficulty
+  imageUrl: String
+  ingredients: [CreateIngredientInput!]
+  instructions: [CreateInstructionInput!]
+  isPublic: Boolean
+  servings: Int
+  title: String
+}
+
+input UpdateUserInput {
+  avatar: String
+  bio: String
+  firstName: String
+  lastName: String
+}
+
+type User {
+  avatar: String
+  bio: String
+  createdAt: DateTime!
+  email: String!
+  firstName: String
+  followersCount: Float!
+  followingCount: Float!
+  id: ID!
+  isActive: Boolean!
+  lastName: String
+  recipesCount: Float!
+  role: UserRole!
+  updatedAt: DateTime!
+  username: String!
+}
+
+"""User role in the system"""
+enum UserRole {
+  ADMIN
+  MODERATOR
+  USER
+}

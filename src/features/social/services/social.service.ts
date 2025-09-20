@@ -1,5 +1,9 @@
 import { PrismaService } from '@/core/database';
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCommentInput } from '../dto/create-comment.dto';
 import { CreateRatingInput } from '../dto/create-rating.dto';
 import { SocialRepository } from '../repositories/social.repository';
@@ -9,19 +13,19 @@ export class SocialService {
   constructor(
     private socialRepository: SocialRepository,
     private prismaService: PrismaService,
-    private notificationsService?: any, // Optional to avoid circular dependency
-  ) { }
+  ) {}
 
   // Rating methods
-  async createOrUpdateRating(userId: string, createRatingInput: CreateRatingInput) {
-    const rating = await this.socialRepository.createRating(userId, createRatingInput);
+  async createOrUpdateRating(
+    userId: string,
+    createRatingInput: CreateRatingInput,
+  ) {
+    const rating = await this.socialRepository.createRating(
+      userId,
+      createRatingInput,
+    );
 
-    // Send real-time notification asynchronously
-    if (this.notificationsService) {
-      this.notificationsService.createRatingNotification(rating.id, userId, createRatingInput.recipeId).catch((error: any) => {
-        console.error('Failed to send rating notification:', error);
-      });
-    }
+    // TODO: Add real-time notification back later
 
     return rating;
   }
@@ -40,14 +44,12 @@ export class SocialService {
 
   // Comment methods
   async createComment(userId: string, createCommentInput: CreateCommentInput) {
-    const comment = await this.socialRepository.createComment(userId, createCommentInput);
+    const comment = await this.socialRepository.createComment(
+      userId,
+      createCommentInput,
+    );
 
-    // Send real-time notification asynchronously
-    if (this.notificationsService) {
-      this.notificationsService.createCommentNotification(comment.id, userId, createCommentInput.recipeId).catch((error: any) => {
-        console.error('Failed to send comment notification:', error);
-      });
-    }
+    // TODO: Add real-time notification back later
 
     return comment;
   }
@@ -72,7 +74,9 @@ export class SocialService {
   async deleteComment(id: string, userId: string) {
     const result = await this.socialRepository.deleteComment(id, userId);
     if (result.count === 0) {
-      throw new NotFoundException('Comment not found or you do not have permission to delete it');
+      throw new NotFoundException(
+        'Comment not found or you do not have permission to delete it',
+      );
     }
     return true;
   }
@@ -83,20 +87,21 @@ export class SocialService {
 
   // Follow methods
   async followUser(followerId: string, followingId: string) {
-    const follow = await this.socialRepository.followUser(followerId, followingId);
+    const follow = await this.socialRepository.followUser(
+      followerId,
+      followingId,
+    );
 
-    // Send real-time notification asynchronously
-    if (this.notificationsService) {
-      this.notificationsService.createFollowNotification(followerId, followingId).catch((error: any) => {
-        console.error('Failed to send follow notification:', error);
-      });
-    }
+    // TODO: Add real-time notification back later
 
     return follow;
   }
 
   async unfollowUser(followerId: string, followingId: string) {
-    const result = await this.socialRepository.unfollowUser(followerId, followingId);
+    const result = await this.socialRepository.unfollowUser(
+      followerId,
+      followingId,
+    );
     if (result.count === 0) {
       throw new NotFoundException('Follow relationship not found');
     }
