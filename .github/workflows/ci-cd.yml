@@ -205,19 +205,17 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: 🔗 Link Railway Project
-        run: |
-          # Create railway project link file
-          echo '{"projectId": "${{ secrets.RAILWAY_PROJECT_ID }}", "environmentId": "${{ secrets.RAILWAY_ENVIRONMENT_ID }}"}' > .railway.json
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
       - name: 🚂 Deploy to Railway
         run: |
-          # Deploy using Railway CLI with environment variables
+          # Deploy using Railway CLI - it will auto-detect or create project
           railway up --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: ⏳ Wait for deployment
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
 
       - name: 🗄️ Run database migrations
         run: |
