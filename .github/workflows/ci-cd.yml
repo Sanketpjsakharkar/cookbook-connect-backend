@@ -205,30 +205,26 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: 🔧 Set Railway Environment Variables
+      - name: 🔧 Configure Railway Authentication
         run: |
-          railway login --token ${{ secrets.RAILWAY_TOKEN }}
-          railway variables set DATABASE_URL="${{ secrets.DATABASE_URL }}" --service cookbook-backend
-          railway variables set REDIS_URL="${{ secrets.REDIS_URL }}" --service cookbook-backend
-          railway variables set GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" --service cookbook-backend
-          railway variables set JWT_SECRET="${{ secrets.JWT_SECRET }}" --service cookbook-backend
-          railway variables set JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" --service cookbook-backend
-          railway variables set NODE_ENV="production" --service cookbook-backend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          # Create Railway config directory and authentication file
+          mkdir -p ~/.railway
+          echo '{"projects": {}, "user": {"token": "${{ secrets.RAILWAY_TOKEN }}"}, "linkedFunctions": null}' > ~/.railway/config.json
 
       - name: 🚂 Deploy to Railway
         run: |
-          railway up --service cookbook-backend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          # Deploy using Railway CLI - now properly authenticated
+          railway up --detach
+
+      - name: ⏳ Wait for deployment
+        run: |
+          echo "Waiting for deployment to be ready..."
+          sleep 30
 
       - name: 🗄️ Run database migrations
         run: |
-          railway run --service cookbook-backend -- npx prisma migrate deploy
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          # Run migrations on Railway - using config file authentication
+          railway run -- npx prisma migrate deploy
 
   # 🔔 Notification
   notify:
