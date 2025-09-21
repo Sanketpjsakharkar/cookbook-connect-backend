@@ -1,8 +1,8 @@
-import { Module } from '@nestjs/common';
 import { ElasticsearchModule } from '@/core/infrastructure/elasticsearch';
-import { SearchService } from './services/search.service';
-import { ElasticsearchSyncService } from './services/elasticsearch-sync.service';
+import { Module } from '@nestjs/common';
 import { SearchResolver } from './resolvers/search.resolver';
+import { ElasticsearchSyncService } from './services/elasticsearch-sync.service';
+import { SearchService } from './services/search.service';
 
 @Module({
   imports: [ElasticsearchModule],
