@@ -37,6 +37,9 @@ jobs:
           # Try frozen lockfile first, fallback if needed
           pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
+      - name: 🗄️ Generate Prisma client
+        run: pnpm db:generate
+
       - name: 🏗️ Build application
         run: pnpm build
 

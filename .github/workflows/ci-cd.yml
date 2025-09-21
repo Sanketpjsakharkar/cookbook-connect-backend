@@ -64,6 +64,9 @@ jobs:
       - name: 🔍 Lint code
         run: pnpm lint
 
+      - name: 🗄️ Generate Prisma client
+        run: pnpm db:generate
+
       - name: 🏗️ Build application
         run: pnpm build
 
