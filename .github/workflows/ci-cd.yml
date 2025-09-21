@@ -228,9 +228,14 @@ jobs:
           }
           EOF
 
+      - name: 🚂 Deploy to Railway
+        run: |
+          # Deploy using Railway CLI - this will create the service if it doesn't exist
+          railway up --detach
+
       - name: 🔧 Set Railway Environment Variables
         run: |
-          # Set all required environment variables in Railway using --set flag
+          # Set all required environment variables in Railway after deployment
           railway variables \
             --set "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
             --set "REDIS_URL=${{ secrets.REDIS_URL }}" \
@@ -238,13 +243,7 @@ jobs:
             --set "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
             --set "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" \
             --set "NODE_ENV=production" \
-            --set "PORT=3000" \
-            --skip-deploys
-
-      - name: 🚂 Deploy to Railway
-        run: |
-          # Deploy using Railway CLI - now properly authenticated and linked
-          railway up --detach
+            --set "PORT=3000"
 
       - name: ⏳ Wait for deployment
         run: |
