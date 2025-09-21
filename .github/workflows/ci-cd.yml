@@ -205,15 +205,43 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: 🔧 Configure Railway Authentication
+      - name: 🔧 Configure Railway Authentication & Project Linking
         run: |
-          # Create Railway config directory and authentication file
+          # Create Railway config directory and authentication file with project linking
           mkdir -p ~/.railway
-          echo '{"projects": {}, "user": {"token": "${{ secrets.RAILWAY_TOKEN }}"}, "linkedFunctions": null}' > ~/.railway/config.json
+          cat > ~/.railway/config.json << EOF
+          {
+            "projects": {
+              "${{ github.workspace }}": {
+                "projectPath": "${{ github.workspace }}",
+                "name": "cookbook-backend",
+                "project": "${{ secrets.RAILWAY_PROJECT_ID }}",
+                "environment": "${{ secrets.RAILWAY_ENVIRONMENT_ID }}",
+                "environmentName": "production",
+                "service": null
+              }
+            },
+            "user": {
+              "token": "${{ secrets.RAILWAY_TOKEN }}"
+            },
+            "linkedFunctions": null
+          }
+          EOF
+
+      - name: 🔧 Set Railway Environment Variables
+        run: |
+          # Set all required environment variables in Railway
+          railway variables set DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          railway variables set REDIS_URL="${{ secrets.REDIS_URL }}"
+          railway variables set GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+          railway variables set JWT_SECRET="${{ secrets.JWT_SECRET }}"
+          railway variables set JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}"
+          railway variables set NODE_ENV="production"
+          railway variables set PORT="3000"
 
       - name: 🚂 Deploy to Railway
         run: |
-          # Deploy using Railway CLI - now properly authenticated
+          # Deploy using Railway CLI - now properly authenticated and linked
           railway up --detach
 
       - name: ⏳ Wait for deployment
