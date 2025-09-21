@@ -24,7 +24,7 @@ export class UsersService {
 
   async findMany(skip?: number, take?: number) {
     const users = await this.usersRepository.findMany(skip, take);
-    return users.map(user => this.mapUserWithCounts(user));
+    return users.map((user: any) => this.mapUserWithCounts(user));
   }
 
   async updateProfile(id: string, updateUserInput: UpdateUserInput) {
@@ -34,7 +34,7 @@ export class UsersService {
 
   async getMostFollowedUsers(limit: number = 10) {
     const users = await this.usersRepository.getMostFollowedUsers(limit);
-    return users.map(user => this.mapUserWithCounts(user));
+    return users.map((user: any) => this.mapUserWithCounts(user));
   }
 
   private mapUserWithCounts(user: any) {

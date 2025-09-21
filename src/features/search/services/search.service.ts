@@ -12,7 +12,7 @@ export class SearchService {
   constructor(
     private elasticsearchService: ElasticsearchService,
     private prismaService: PrismaService,
-  ) { }
+  ) {}
 
   async searchRecipes(searchQuery: SearchQueryInput): Promise<SearchResult> {
     const startTime = Date.now();
@@ -28,9 +28,7 @@ export class SearchService {
         _source: ['id'], // Only return IDs for efficiency
       });
 
-      const recipeIds = response.hits.hits.map(
-        (hit: any) => hit._source.id,
-      );
+      const recipeIds = response.hits.hits.map((hit: any) => hit._source.id);
 
       // Fetch full recipe data from database to ensure consistency
       const recipes = await this.fetchRecipesFromDatabase(recipeIds);
@@ -106,9 +104,7 @@ export class SearchService {
       };
 
       const response = await this.elasticsearchService.search('recipes', query);
-      const recipeIds = response.hits.hits.map(
-        (hit: any) => hit._source.id,
-      );
+      const recipeIds = response.hits.hits.map((hit: any) => hit._source.id);
       const recipes = await this.fetchRecipesFromDatabase(recipeIds);
 
       const took = Date.now() - startTime;
@@ -352,19 +348,23 @@ export class SearchService {
     const recipeMap = new Map(recipes.map(recipe => [recipe.id, recipe]));
     const orderedRecipes = recipeIds
       .map(id => recipeMap.get(id))
-      .filter((recipe): recipe is NonNullable<typeof recipe> => recipe !== undefined)
-      .map(recipe => {
+      .filter(
+        (recipe): recipe is NonNullable<typeof recipe> => recipe !== undefined,
+      )
+      .map((recipe: any) => {
         const avgRating =
           recipe.ratings.length > 0
-            ? recipe.ratings.reduce((sum, rating) => sum + rating.value, 0) /
-            recipe.ratings.length
+            ? recipe.ratings.reduce(
+                (sum: number, rating: any) => sum + rating.value,
+                0,
+              ) / recipe.ratings.length
             : null;
 
         return {
           ...recipe,
           description: recipe.description || undefined,
-          cuisine: recipe.cuisine as CuisineType || undefined,
-          difficulty: recipe.difficulty as RecipeDifficulty || undefined,
+          cuisine: (recipe.cuisine as CuisineType) || undefined,
+          difficulty: (recipe.difficulty as RecipeDifficulty) || undefined,
           cookingTime: recipe.cookingTime || undefined,
           servings: recipe.servings || undefined,
           imageUrl: recipe.imageUrl || undefined,

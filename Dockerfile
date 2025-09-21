@@ -44,6 +44,9 @@ FROM base AS production
 # Copy source code
 COPY . .
 
+# Regenerate Prisma client with latest schema
+RUN pnpm prisma generate
+
 # Build the application
 RUN pnpm build
 
