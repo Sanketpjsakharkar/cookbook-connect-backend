@@ -205,30 +205,26 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: 🔧 Set Railway Environment Variables
+      - name: 🔗 Link Railway Project
         run: |
-          railway login --token ${{ secrets.RAILWAY_TOKEN }}
-          railway variables set DATABASE_URL="${{ secrets.DATABASE_URL }}" --service cookbook-backend
-          railway variables set REDIS_URL="${{ secrets.REDIS_URL }}" --service cookbook-backend
-          railway variables set GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" --service cookbook-backend
-          railway variables set JWT_SECRET="${{ secrets.JWT_SECRET }}" --service cookbook-backend
-          railway variables set JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}" --service cookbook-backend
-          railway variables set NODE_ENV="production" --service cookbook-backend
+          # Create railway project link file
+          echo '{"projectId": "${{ secrets.RAILWAY_PROJECT_ID }}", "environmentId": "${{ secrets.RAILWAY_ENVIRONMENT_ID }}"}' > .railway.json
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: 🚂 Deploy to Railway
         run: |
-          railway up --service cookbook-backend
+          # Deploy using Railway CLI with environment variables
+          railway up --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: 🗄️ Run database migrations
         run: |
-          railway run --service cookbook-backend -- npx prisma migrate deploy
+          # Run migrations on Railway
+          railway run -- npx prisma migrate deploy
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
   # 🔔 Notification
   notify:
