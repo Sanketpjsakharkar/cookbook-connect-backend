@@ -18,4 +18,10 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
+  // Handle async operations and open handles
+  detectOpenHandles: true,
+  forceExit: true,
+  testTimeout: 30000,
+  // Cleanup after tests
+  setupFilesAfterEnv: ['<rootDir>/test-setup.ts'],
 };
