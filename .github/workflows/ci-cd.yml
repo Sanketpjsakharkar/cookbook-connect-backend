@@ -205,12 +205,16 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
+      - name: 🔧 Configure Railway Authentication
+        run: |
+          # Create Railway config directory and authentication file
+          mkdir -p ~/.railway
+          echo '{"projects": {}, "user": {"token": "${{ secrets.RAILWAY_TOKEN }}"}, "linkedFunctions": null}' > ~/.railway/config.json
+
       - name: 🚂 Deploy to Railway
         run: |
-          # Deploy using Railway CLI - it will auto-detect or create project
+          # Deploy using Railway CLI - now properly authenticated
           railway up --detach
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: ⏳ Wait for deployment
         run: |
@@ -219,10 +223,8 @@ jobs:
 
       - name: 🗄️ Run database migrations
         run: |
-          # Run migrations on Railway
+          # Run migrations on Railway - using config file authentication
           railway run -- npx prisma migrate deploy
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   # 🔔 Notification
   notify:
