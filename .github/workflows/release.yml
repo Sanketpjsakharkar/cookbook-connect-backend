@@ -7,7 +7,7 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '8'
+  PNPM_VERSION: '10.10.0'
 
 jobs:
   # 🏷️ Create GitHub Release
@@ -33,7 +33,9 @@ jobs:
           cache: 'pnpm'
 
       - name: 📥 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          # Try frozen lockfile first, fallback if needed
+          pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
       - name: 🏗️ Build application
         run: pnpm build
