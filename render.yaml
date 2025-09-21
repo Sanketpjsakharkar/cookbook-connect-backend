@@ -19,6 +19,12 @@ services:
           type: redis
           name: cookbook-redis
           property: connectionString
+      - key: GEMINI_API_KEY
+        fromSecret: GEMINI_API_KEY
+      - key: JWT_SECRET
+        fromSecret: JWT_SECRET
+      - key: JWT_REFRESH_SECRET
+        fromSecret: JWT_REFRESH_SECRET
 
 databases:
   - name: cookbook-db

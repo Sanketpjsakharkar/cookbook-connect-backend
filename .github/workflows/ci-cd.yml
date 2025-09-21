@@ -166,9 +166,9 @@ jobs:
   #         echo "ℹ️  Docker images are for future container deployments"
   #         echo "✅ Railway deployment will continue regardless of Docker build status"
 
-  # 🚀 Deploy to Railway
+  # 🚀 Deploy to Render (Railway alternative due to plan limitations)
   deploy:
-    name: 🚀 Deploy to Railway
+    name: 🚀 Deploy to Render
     runs-on: ubuntu-latest
     # No dependencies - deploy directly to save GitHub Actions minutes
     if: github.ref == 'refs/heads/main'
@@ -200,60 +200,20 @@ jobs:
       - name: 🏗️ Build application
         run: pnpm build
 
-      - name: 🚂 Install Railway CLI
+      - name: 🚀 Deploy to Render
         run: |
-          curl -fsSL https://railway.app/install.sh | sh
-          echo "$HOME/.railway/bin" >> $GITHUB_PATH
-
-      - name: 🔧 Configure Railway Authentication & Project Linking
-        run: |
-          # Create Railway config directory and authentication file with project linking
-          mkdir -p ~/.railway
-          cat > ~/.railway/config.json << EOF
-          {
-            "projects": {
-              "${{ github.workspace }}": {
-                "projectPath": "${{ github.workspace }}",
-                "name": "cookbook-backend",
-                "project": "${{ secrets.RAILWAY_PROJECT_ID }}",
-                "environment": "${{ secrets.RAILWAY_ENVIRONMENT_ID }}",
-                "environmentName": "production",
-                "service": null
-              }
-            },
-            "user": {
-              "token": "${{ secrets.RAILWAY_TOKEN }}"
-            },
-            "linkedFunctions": null
-          }
-          EOF
-
-      - name: 🚂 Deploy to Railway
-        run: |
-          # Deploy using Railway CLI - this will create the service if it doesn't exist
-          railway up --detach
-
-      - name: 🔧 Set Railway Environment Variables
-        run: |
-          # Set all required environment variables in Railway after deployment
-          railway variables \
-            --set "DATABASE_URL=${{ secrets.DATABASE_URL }}" \
-            --set "REDIS_URL=${{ secrets.REDIS_URL }}" \
-            --set "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
-            --set "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
-            --set "JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}" \
-            --set "NODE_ENV=production" \
-            --set "PORT=3000"
-
-      - name: ⏳ Wait for deployment
-        run: |
-          echo "Waiting for deployment to be ready..."
-          sleep 30
-
-      - name: 🗄️ Run database migrations
-        run: |
-          # Run migrations on Railway - using config file authentication
-          railway run -- npx prisma migrate deploy
+          # Render will automatically deploy from GitHub when we push
+          # The render.yaml file configures the deployment
+          echo "🎉 Deployment will be triggered automatically by Render"
+          echo "📋 Render will:"
+          echo "  - Build using Dockerfile"
+          echo "  - Create PostgreSQL database"
+          echo "  - Create Redis instance"
+          echo "  - Set up environment variables"
+          echo "  - Deploy the application"
+          echo ""
+          echo "🌐 Check your Render dashboard for deployment status"
+          echo "📊 Deployment URL will be available in Render dashboard"
 
   # 🔔 Notification
   notify:
