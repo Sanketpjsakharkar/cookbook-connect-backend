@@ -2,18 +2,15 @@ import { RedisService } from '@/core/infrastructure/redis';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
-
-export interface AIUsageMetrics {
-    totalRequests: number;
-    totalTokens: number;
-    totalCost: number;
-    requestsToday: number;
-    tokensToday: number;
-    costToday: number;
-}
+import {
+    AIChatMessage,
+    AICompletionOptions,
+    AIUsageMetrics,
+    IAIService
+} from '../ai/interfaces/ai-service.interface';
 
 @Injectable()
-export class OpenAIService {
+export class OpenAIService implements IAIService {
     private readonly logger = new Logger(OpenAIService.name);
     private readonly client: OpenAI;
     private readonly maxTokens: number;
@@ -41,12 +38,7 @@ export class OpenAIService {
     async generateCompletion(
         prompt: string,
         systemMessage?: string,
-        options?: {
-            maxTokens?: number;
-            temperature?: number;
-            cacheKey?: string;
-            cacheTTL?: number;
-        },
+        options?: AICompletionOptions,
     ): Promise<string | null> {
         try {
             // Check cache first if cache key provided
@@ -120,6 +112,57 @@ export class OpenAIService {
         }
     }
 
+    async generateChatCompletion(
+        messages: AIChatMessage[],
+        options?: AICompletionOptions,
+    ): Promise<string | null> {
+        try {
+            // Check cache first if cache key provided
+            if (options?.cacheKey) {
+                const cached = await this.getCachedResponse(options.cacheKey);
+                if (cached) {
+                    return cached;
+                }
+            }
+
+            const startTime = Date.now();
+
+            const response = await this.client.chat.completions.create({
+                model: this.model,
+                messages: messages.map(msg => ({
+                    role: msg.role,
+                    content: msg.content,
+                })),
+                max_tokens: options?.maxTokens || this.maxTokens,
+                temperature: options?.temperature || this.temperature,
+            });
+
+            const responseTime = Date.now() - startTime;
+            const content = response.choices[0]?.message?.content;
+
+            if (!content) {
+                this.logger.warn('No content in OpenAI response');
+                return null;
+            }
+
+            // Log usage metrics
+            await this.logUsageMetrics(response.usage, responseTime);
+
+            // Cache the response if cache key provided
+            if (options?.cacheKey) {
+                await this.cacheResponse(options.cacheKey, content, options.cacheTTL || 3600);
+            }
+
+            this.logger.debug(`OpenAI chat completion generated in ${responseTime}ms`);
+            return content.trim();
+
+        } catch (error) {
+            this.logger.error('OpenAI chat completion error:', error);
+            await this.logError(error as Error);
+            return null;
+        }
+    }
+
     async isHealthy(): Promise<boolean> {
         try {
             if (!this.configService.get<string>('openai.apiKey')) {
@@ -138,6 +181,10 @@ export class OpenAIService {
             this.logger.error('OpenAI health check failed:', error);
             return false;
         }
+    }
+
+    getProviderName(): string {
+        return 'OpenAI';
     }
 
     async getUsageMetrics(): Promise<AIUsageMetrics> {

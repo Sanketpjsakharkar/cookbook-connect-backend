@@ -813,8 +813,8 @@
             "body": {
               "mode": "graphql",
               "graphql": {
-                "query": "query AnalyzeRecipe($recipeId: ID!) {\n  analyzeRecipe(recipeId: $recipeId) {\n    improvements {\n      category\n      suggestion\n      reason\n      importance\n    }\n    complexity {\n      level\n      factors\n      estimatedTime\n    }\n    tips\n  }\n}",
-                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
+                "query": "query AnalyzeRecipe($input: RecipeAnalysisInput!) {\n  analyzeRecipe(input: $input) {\n    analysisId\n    recipeId\n    summary\n    overallRating\n    improvements {\n      category\n      suggestion\n      reason\n    }\n    createdAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\"\n  }\n}"
               }
             },
             "url": {
@@ -842,8 +842,8 @@
             "body": {
               "mode": "graphql",
               "graphql": {
-                "query": "query GetSubstitutions($input: SubstitutionRequestInput!) {\n  getIngredientSubstitutions(input: $input) {\n    ingredient\n    substitutions {\n      name\n      ratio\n      notes\n      suitability\n    }\n    dietaryNeed\n  }\n}",
-                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"ingredient\": \"butter\",\n    \"dietaryNeed\": \"VEGAN\"\n  }\n}"
+                "query": "query GetSubstitutions($input: SubstitutionRequestInput!) {\n  getIngredientSubstitutions(input: $input) {\n    requestId\n    substitutions {\n      original\n      substitute\n      ratio\n      notes\n      impact\n    }\n    overallNotes\n    difficultyChange\n    createdAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"restrictions\": [\"VEGAN\"]\n  }\n}"
               }
             },
             "url": {
@@ -871,8 +871,8 @@
             "body": {
               "mode": "graphql",
               "graphql": {
-                "query": "query GetCookingTips($input: CookingTipsRequestInput!) {\n  getCookingTips(input: $input) {\n    tips {\n      category\n      tip\n      importance\n    }\n    skillLevel\n    estimatedTime\n  }\n}",
-                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"skillLevel\": \"BEGINNER\"\n  }\n}"
+                "query": "query GetCookingTips($input: CookingTipsInput!) {\n  getCookingTips(input: $input) {\n    guidanceId\n    recipeId\n    tips {\n      category\n      tip\n      importance\n      skillLevel\n    }\n    keyTechniques\n    commonMistakes\n    successIndicators\n    createdAt\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\"\n  }\n}"
               }
             },
             "url": {
@@ -900,8 +900,8 @@
             "body": {
               "mode": "graphql",
               "graphql": {
-                "query": "query GetTechniqueGuidance($input: CookingTipsRequestInput!) {\n  getTechniqueGuidance(input: $input) {\n    technique\n    description\n    tips\n    difficulty\n    estimatedTime\n  }\n}",
-                "variables": "{\n  \"input\": {\n    \"recipeId\": \"recipe-id-here\",\n    \"skillLevel\": \"INTERMEDIATE\"\n  }\n}"
+                "query": "query GetTechniqueGuidance($input: TechniqueGuidanceInput!) {\n  getTechniqueGuidance(input: $input) {\n    category\n    tip\n    importance\n    skillLevel\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"difficulty\": \"INTERMEDIATE\",\n    \"techniques\": [\"sauteing\", \"knife-skills\"]\n  }\n}"
               }
             },
             "url": {
@@ -911,7 +911,7 @@
           }
         },
         {
-          "name": "Batch Analyze Recipes",
+          "name": "Generate Recipe Insights",
           "request": {
             "method": "POST",
             "header": [
@@ -929,8 +929,8 @@
             "body": {
               "mode": "graphql",
               "graphql": {
-                "query": "mutation BatchAnalyzeRecipes($recipeIds: [ID!]!) {\n  batchAnalyzeRecipes(recipeIds: $recipeIds) {\n    recipeId\n    improvements {\n      category\n      suggestion\n      reason\n      importance\n    }\n    complexity {\n      level\n      factors\n      estimatedTime\n    }\n    tips\n  }\n}",
-                "variables": "{\n  \"recipeIds\": [\n    \"recipe-id-1\",\n    \"recipe-id-2\",\n    \"recipe-id-3\"\n  ]\n}"
+                "query": "mutation GenerateRecipeInsights($recipeId: String!) {\n  generateRecipeInsights(recipeId: $recipeId) {\n    type\n    success\n    message\n    data\n    responseTime\n    cached\n    createdAt\n  }\n}",
+                "variables": "{\n  \"recipeId\": \"recipe-id-here\"\n}"
               }
             },
             "url": {

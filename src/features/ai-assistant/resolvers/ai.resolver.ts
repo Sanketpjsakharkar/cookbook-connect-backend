@@ -1,4 +1,4 @@
-import { OpenAIService } from '@/core/infrastructure/external-apis/openai';
+import { AIService } from '@/core/infrastructure/external-apis/ai';
 import { CurrentUser } from '@/shared/decorators';
 import { JwtAuthGuard } from '@/shared/guards';
 import { Logger, UseGuards } from '@nestjs/common';
@@ -33,18 +33,18 @@ export class AIResolver {
         private recipeAnalyzerService: RecipeAnalyzerService,
         private ingredientSubstitutionService: IngredientSubstitutionService,
         private cookingTipsService: CookingTipsService,
-        private openAIService: OpenAIService,
+        private aiService: AIService,
     ) { }
 
     // Recipe Analysis Queries
     @Query(() => RecipeAnalysis, { nullable: true })
     async analyzeRecipe(
         @Args('input') input: RecipeAnalysisInput,
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<RecipeAnalysis | null> {
         try {
             const startTime = Date.now();
-            const analysis = await this.recipeAnalyzerService.analyzeRecipe(input.recipeId, user.id);
+            const analysis = await this.recipeAnalyzerService.analyzeRecipe(input.recipeId, _user.id);
             const responseTime = Date.now() - startTime;
 
             this.logger.debug(`Recipe analysis completed in ${responseTime}ms for recipe ${input.recipeId}`);
@@ -58,10 +58,10 @@ export class AIResolver {
     @Query(() => [String], { nullable: true })
     async getQuickSuggestions(
         @Args('input') input: QuickSuggestionsInput,
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<string[] | null> {
         try {
-            return await this.recipeAnalyzerService.getQuickSuggestions(input.recipeId, user.id);
+            return await this.recipeAnalyzerService.getQuickSuggestions(input.recipeId, _user.id);
         } catch (error) {
             this.logger.error(`Failed to get quick suggestions for recipe ${input.recipeId}:`, error);
             return null;
@@ -71,7 +71,7 @@ export class AIResolver {
     @Query(() => String, { nullable: true })
     async getRecipeComplexity(
         @Args('recipeId') recipeId: string,
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<string | null> {
         try {
             const complexity = await this.recipeAnalyzerService.analyzeRecipeComplexity(recipeId);
@@ -86,14 +86,14 @@ export class AIResolver {
     @Query(() => SubstitutionResult, { nullable: true })
     async getIngredientSubstitutions(
         @Args('input') input: SubstitutionRequestInput,
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<SubstitutionResult | null> {
         try {
             const startTime = Date.now();
             const result = await this.ingredientSubstitutionService.getSubstitutions(
                 input.recipeId,
                 input.restrictions.map(r => r.toLowerCase()) as any[],
-                user.id,
+                _user.id,
             );
             const responseTime = Date.now() - startTime;
 
@@ -127,13 +127,13 @@ export class AIResolver {
     async getDietarySubstitutions(
         @Args('recipeId') recipeId: string,
         @Args('dietaryNeed', { type: () => DietaryRestriction }) dietaryNeed: DietaryRestriction,
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<SubstitutionResult | null> {
         try {
             return await this.ingredientSubstitutionService.getDietarySubstitutions(
                 recipeId,
                 dietaryNeed.toLowerCase() as any,
-                user.id,
+                _user.id,
             );
         } catch (error) {
             this.logger.error(`Failed to get dietary substitutions for recipe ${recipeId}:`, error);
@@ -156,11 +156,11 @@ export class AIResolver {
     @Query(() => CookingGuidance, { nullable: true })
     async getCookingTips(
         @Args('input') input: CookingTipsInput,
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<CookingGuidance | null> {
         try {
             const startTime = Date.now();
-            const guidance = await this.cookingTipsService.getCookingTips(input.recipeId, user.id);
+            const guidance = await this.cookingTipsService.getCookingTips(input.recipeId, __user.id);
             const responseTime = Date.now() - startTime;
 
             this.logger.debug(`Cooking tips generated in ${responseTime}ms for recipe ${input.recipeId}`);
@@ -214,11 +214,11 @@ export class AIResolver {
 
     // AI Service Management
     @Query(() => AIUsageMetrics)
-    async getAIUsageMetrics(@CurrentUser() user: any): Promise<AIUsageMetrics> {
+    async getAIUsageMetrics(@CurrentUser() _user: any): Promise<AIUsageMetrics> {
         try {
             // Only allow admin users to view usage metrics
             // For now, return metrics for all authenticated users
-            return await this.openAIService.getUsageMetrics();
+            return await this.aiService.getUsageMetrics();
         } catch (error) {
             this.logger.error('Failed to get AI usage metrics:', error);
             return {
@@ -235,7 +235,7 @@ export class AIResolver {
     @Query(() => Boolean)
     async isAIServiceHealthy(): Promise<boolean> {
         try {
-            return await this.openAIService.isHealthy();
+            return await this.aiService.isHealthy();
         } catch (error) {
             this.logger.error('AI service health check failed:', error);
             return false;
@@ -246,16 +246,16 @@ export class AIResolver {
     @Mutation(() => AIResponse)
     async generateRecipeInsights(
         @Args('recipeId') recipeId: string,
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<AIResponse> {
         const startTime = Date.now();
 
         try {
             // Generate comprehensive insights for a recipe
             const [analysis, tips, quickSuggestions] = await Promise.allSettled([
-                this.recipeAnalyzerService.analyzeRecipe(recipeId, user.id),
-                this.cookingTipsService.getCookingTips(recipeId, user.id),
-                this.recipeAnalyzerService.getQuickSuggestions(recipeId, user.id),
+                this.recipeAnalyzerService.analyzeRecipe(recipeId, _user.id),
+                this.cookingTipsService.getCookingTips(recipeId, _user.id),
+                this.recipeAnalyzerService.getQuickSuggestions(recipeId, _user.id),
             ]);
 
             const insights = {
@@ -294,7 +294,7 @@ export class AIResolver {
     async generateDietaryAlternatives(
         @Args('recipeId') recipeId: string,
         @Args('restrictions', { type: () => [DietaryRestriction] }) restrictions: DietaryRestriction[],
-        @CurrentUser() user: any,
+        @CurrentUser() _user: any,
     ): Promise<AIResponse> {
         const startTime = Date.now();
 
@@ -302,7 +302,7 @@ export class AIResolver {
             const substitutions = await this.ingredientSubstitutionService.getSubstitutions(
                 recipeId,
                 restrictions.map(r => r.toLowerCase()) as any[],
-                user.id,
+                _user.id,
             );
 
             const responseTime = Date.now() - startTime;

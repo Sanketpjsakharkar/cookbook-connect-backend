@@ -1,5 +1,5 @@
 import { PrismaService } from '@/core/database';
-import { OpenAIService } from '@/core/infrastructure/external-apis/openai';
+import { AIService } from '@/core/infrastructure/external-apis/ai';
 import { Injectable, Logger } from '@nestjs/common';
 import { RecipeImprovementPrompt } from '../prompts/recipe-improvement.prompt';
 
@@ -24,7 +24,7 @@ export class RecipeAnalyzerService {
 
     constructor(
         private prismaService: PrismaService,
-        private openAIService: OpenAIService,
+        private aiService: AIService,
     ) { }
 
     async analyzeRecipe(recipeId: string, userId: string): Promise<RecipeAnalysis | null> {
@@ -79,7 +79,7 @@ export class RecipeAnalyzerService {
 
             const systemMessage = RecipeImprovementPrompt.getSystemMessage();
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 systemMessage,
                 {
@@ -142,7 +142,7 @@ export class RecipeAnalyzerService {
                 recipe.description || 'No description provided',
             );
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 'You are a chef providing quick recipe improvement tips. Respond with 3 brief, practical suggestions as a simple list.',
                 {
@@ -298,7 +298,7 @@ export class RecipeAnalyzerService {
                 createdAt: new Date(),
             };
 
-        } catch (error) {
+        } catch {
             // Fallback: try to extract suggestions from plain text
             this.logger.warn('Failed to parse JSON response, attempting text extraction');
 

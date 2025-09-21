@@ -171,4 +171,50 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       return false;
     }
   }
+
+  // Counter operations
+  async incr(key: string): Promise<number> {
+    try {
+      return await this.client.incr(key);
+    } catch (error) {
+      this.logger.error(`Failed to incr ${key}:`, error);
+      return 0;
+    }
+  }
+
+  async incrby(key: string, increment: number): Promise<number> {
+    try {
+      return await this.client.incrby(key, increment);
+    } catch (error) {
+      this.logger.error(`Failed to incrby ${key}:`, error);
+      return 0;
+    }
+  }
+
+  async incrbyfloat(key: string, increment: number): Promise<number> {
+    try {
+      const result = await this.client.incrbyfloat(key, increment);
+      return parseFloat(result);
+    } catch (error) {
+      this.logger.error(`Failed to incrbyfloat ${key}:`, error);
+      return 0;
+    }
+  }
+
+  // TTL operations
+  async expire(key: string, seconds: number): Promise<void> {
+    try {
+      await this.client.expire(key, seconds);
+    } catch (error) {
+      this.logger.error(`Failed to expire ${key}:`, error);
+    }
+  }
+
+  async setex(key: string, seconds: number, value: string): Promise<void> {
+    try {
+      await this.client.setex(key, seconds, value);
+    } catch (error) {
+      this.logger.error(`Failed to setex ${key}:`, error);
+    }
+  }
 }

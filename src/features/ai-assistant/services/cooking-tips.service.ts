@@ -1,5 +1,5 @@
 import { PrismaService } from '@/core/database';
-import { OpenAIService } from '@/core/infrastructure/external-apis/openai';
+import { AIService } from '@/core/infrastructure/external-apis/ai';
 import { Injectable, Logger } from '@nestjs/common';
 import { CookingTipsPrompt } from '../prompts/cooking-tips.prompt';
 
@@ -26,7 +26,7 @@ export class CookingTipsService {
 
     constructor(
         private prismaService: PrismaService,
-        private openAIService: OpenAIService,
+        private aiService: AIService,
     ) { }
 
     async getCookingTips(recipeId: string, userId: string): Promise<CookingGuidance | null> {
@@ -79,7 +79,7 @@ export class CookingTipsService {
 
             const systemMessage = CookingTipsPrompt.getSystemMessage();
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 systemMessage,
                 {
@@ -120,7 +120,7 @@ export class CookingTipsService {
 
             const prompt = CookingTipsPrompt.generateTechniquePrompt(techniques, difficulty);
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 CookingTipsPrompt.getSystemMessage(),
                 {
@@ -169,7 +169,7 @@ export class CookingTipsService {
 
             const prompt = CookingTipsPrompt.generateIngredientTipsPrompt(ingredients, cookingMethod);
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 CookingTipsPrompt.getSystemMessage(),
                 {
@@ -211,7 +211,7 @@ export class CookingTipsService {
 
             const prompt = CookingTipsPrompt.generateTroubleshootingPrompt(recipeTitle, commonIssues);
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 'You are a cooking expert providing troubleshooting advice. Be specific and practical.',
                 {
@@ -251,7 +251,7 @@ export class CookingTipsService {
 
             const prompt = CookingTipsPrompt.generateSkillLevelTipsPrompt(recipeTitle, targetSkillLevel);
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 CookingTipsPrompt.getSystemMessage(),
                 {
@@ -313,7 +313,7 @@ export class CookingTipsService {
       
       Focus on the most important things to get right.`;
 
-            const aiResponse = await this.openAIService.generateCompletion(
+            const aiResponse = await this.aiService.generateCompletion(
                 prompt,
                 'You are a chef providing concise, practical cooking tips. Be brief and specific.',
                 {
@@ -366,7 +366,7 @@ export class CookingTipsService {
                 createdAt: new Date(),
             };
 
-        } catch (error) {
+        } catch {
             // Fallback: extract tips from text
             this.logger.warn('Failed to parse JSON response, attempting text extraction');
 

@@ -27,6 +27,11 @@ A recipe sharing platform backend built with NestJS, GraphQL, PostgreSQL, Elasti
    # Edit .env with your configuration
    ```
 
+   **🆓 For AI features (Free!):**
+   - Get your free Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Add `GEMINI_API_KEY="your-key-here"` to your `.env` file
+   - See [AI Migration Guide](docs/ai-migration-guide.md) for details
+
 3. **Start infrastructure services:**
 
    ```bash
@@ -101,7 +106,7 @@ src/
 - **Database**: PostgreSQL with Prisma ORM
 - **Search**: Elasticsearch
 - **Cache/PubSub**: Redis
-- **AI**: OpenAI API
+- **AI**: Google Gemini API (Free tier available) 🆓
 - **Testing**: Jest
 - **Code Quality**: ESLint, Prettier, Husky
 

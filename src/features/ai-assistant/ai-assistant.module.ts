@@ -1,4 +1,4 @@
-import { OpenAIModule } from '@/core/infrastructure/external-apis/openai';
+import { AIModule } from '@/core/infrastructure/external-apis/ai';
 import { RedisModule } from '@/core/infrastructure/redis';
 import { Module } from '@nestjs/common';
 import { AIRateLimitGuard } from './guards/ai-rate-limit.guard';
@@ -8,7 +8,7 @@ import { IngredientSubstitutionService } from './services/ingredient-substitutio
 import { RecipeAnalyzerService } from './services/recipe-analyzer.service';
 
 @Module({
-    imports: [OpenAIModule, RedisModule],
+    imports: [AIModule, RedisModule],
     providers: [
         RecipeAnalyzerService,
         IngredientSubstitutionService,
@@ -23,4 +23,4 @@ import { RecipeAnalyzerService } from './services/recipe-analyzer.service';
         AIRateLimitGuard,
     ],
 })
-export class AIModule { }
+export class AIAssistantModule { }
