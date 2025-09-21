@@ -205,16 +205,28 @@ jobs:
           curl -fsSL https://railway.app/install.sh | sh
           echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: 🔧 Configure Railway Authentication
+      - name: 🔧 Configure Railway Authentication & Project Linking
         run: |
-          # Create Railway config directory and authentication file
+          # Create Railway config directory and authentication file with project linking
           mkdir -p ~/.railway
-          echo '{"projects": {}, "user": {"token": "${{ secrets.RAILWAY_TOKEN }}"}, "linkedFunctions": null}' > ~/.railway/config.json
-
-      - name: 🔗 Link Railway Project
-        run: |
-          # Create project link file that Railway CLI expects
-          echo '{"projectId": "${{ secrets.RAILWAY_PROJECT_ID }}", "environmentId": "${{ secrets.RAILWAY_ENVIRONMENT_ID }}"}' > .railway.json
+          cat > ~/.railway/config.json << EOF
+          {
+            "projects": {
+              "${{ github.workspace }}": {
+                "projectPath": "${{ github.workspace }}",
+                "name": "cookbook-backend",
+                "project": "${{ secrets.RAILWAY_PROJECT_ID }}",
+                "environment": "${{ secrets.RAILWAY_ENVIRONMENT_ID }}",
+                "environmentName": "production",
+                "service": null
+              }
+            },
+            "user": {
+              "token": "${{ secrets.RAILWAY_TOKEN }}"
+            },
+            "linkedFunctions": null
+          }
+          EOF
 
       - name: 🚂 Deploy to Railway
         run: |
