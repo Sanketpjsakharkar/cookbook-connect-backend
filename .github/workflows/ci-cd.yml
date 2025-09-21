@@ -211,9 +211,14 @@ jobs:
           mkdir -p ~/.railway
           echo '{"projects": {}, "user": {"token": "${{ secrets.RAILWAY_TOKEN }}"}, "linkedFunctions": null}' > ~/.railway/config.json
 
+      - name: 🔗 Link Railway Project
+        run: |
+          # Create project link file that Railway CLI expects
+          echo '{"projectId": "${{ secrets.RAILWAY_PROJECT_ID }}", "environmentId": "${{ secrets.RAILWAY_ENVIRONMENT_ID }}"}' > .railway.json
+
       - name: 🚂 Deploy to Railway
         run: |
-          # Deploy using Railway CLI - now properly authenticated
+          # Deploy using Railway CLI - now properly authenticated and linked
           railway up --detach
 
       - name: ⏳ Wait for deployment
