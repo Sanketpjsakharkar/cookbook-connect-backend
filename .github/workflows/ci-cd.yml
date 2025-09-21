@@ -228,6 +228,17 @@ jobs:
           }
           EOF
 
+      - name: 🔧 Set Railway Environment Variables
+        run: |
+          # Set all required environment variables in Railway
+          railway variables set DATABASE_URL="${{ secrets.DATABASE_URL }}"
+          railway variables set REDIS_URL="${{ secrets.REDIS_URL }}"
+          railway variables set GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"
+          railway variables set JWT_SECRET="${{ secrets.JWT_SECRET }}"
+          railway variables set JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}"
+          railway variables set NODE_ENV="production"
+          railway variables set PORT="3000"
+
       - name: 🚂 Deploy to Railway
         run: |
           # Deploy using Railway CLI - now properly authenticated and linked
