@@ -84,7 +84,7 @@ jobs:
           JWT_SECRET: test-secret
           JWT_REFRESH_SECRET: test-refresh-secret
           GEMINI_API_KEY: test-key
-        run: pnpm test
+        run: pnpm test --detectOpenHandles --forceExit
 
       - name: 📊 Run test coverage
         env:
@@ -93,7 +93,7 @@ jobs:
           JWT_SECRET: test-secret
           JWT_REFRESH_SECRET: test-refresh-secret
           GEMINI_API_KEY: test-key
-        run: pnpm test:cov
+        run: pnpm test:cov --detectOpenHandles --forceExit
 
       - name: 📈 Upload coverage to Codecov
         uses: codecov/codecov-action@v3
